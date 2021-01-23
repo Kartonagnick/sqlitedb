@@ -4,9 +4,9 @@
 Содержание:
 -----------
 
-1) [cmdbit](000-cmdbit.md)  
-2) [garbage](001-garbage.md)  
-3) [find_in](002-find_in.md)  
-4) [История](history.md)  
+1) [Требования](dev/000-requirements.md)
+2) [Архитектура](dev/001-architecture.md)
+
+3) [История](history.md)  
 
 

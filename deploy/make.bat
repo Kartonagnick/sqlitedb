@@ -10,8 +10,8 @@ rem ============================================================================
     set "eDEBUG=ON"
     set "order=msvc:64:debug:dynamic"
 
-rem for development
-rem    (call :generate)    || (goto :failed)
+    rem for development
+    (call :generate) && (goto :success) || (goto :failed)
 
     (call :clean)    || (goto :failed)
     (call :build)    || (goto :failed)
