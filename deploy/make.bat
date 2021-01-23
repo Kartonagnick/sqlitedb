@@ -7,13 +7,15 @@ rem ============================================================================
     setlocal
     @echo [MAKE] run...
 
-    set "eDEBUG=ON"
+    rem set "eDEBUG=ON"
     set "order=msvc:64:debug:dynamic"
+    rem set "order=mingw:64:debug:static"
+    rem set "order=all"
 
     rem for development
     (call :generate) && (goto :success) || (goto :failed)
 
-    (call :clean)    || (goto :failed)
+rem    (call :clean)    || (goto :failed)
     (call :build)    || (goto :failed)
     (call :runTests) || (goto :failed)
     (call :install)  || (goto :failed)

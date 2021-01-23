@@ -14,42 +14,44 @@ namespace db
     namespace
     {
         // true, если все указанные в my включены в flags
-        inline bool has_flags(const int my, const int flags) noexcept
+        inline bool hasFlags(const int my, const int flags) noexcept
             { return (my & flags) == my; }
 
+        #if 0
         // true, если любой, из указаннных в my, включен в flags
-        inline bool has_any_flags(const int my, const int flags) noexcept
+        inline bool hasAnyFlags(const int my, const int flags) noexcept
             { return (my & flags) != 0; }
+        #endif
 
-        inline void add_flags(const int my, int& flags) noexcept
+        inline void addFlags(const int my, int& flags) noexcept
             { flags |= my; }
 
-        inline void del_flags(const int my, int& flags) noexcept
+        inline void delFlags(const int my, int& flags) noexcept
             { flags &= (~my); }
 
-        inline bool check_source_mode(int flags) noexcept
+        inline bool checkFlags(int flags) noexcept
         {
             const int my = eREADONLY | eREADWRITE | eCREATE | eOPEN_URI;
-            ::db::del_flags(my, flags);
+            ::db::delFlags(my, flags);
             return flags == 0;
         }
 
         inline int adaptive(const int mode) noexcept
         {
-            assert(db::check_source_mode(mode));
+            assert(db::checkFlags(mode));
             int flags = 0;
 
-            if (has_flags(eCREATE, mode))
-                ::db::add_flags(SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, flags);
+            if (hasFlags(eCREATE, mode))
+                ::db::addFlags(SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, flags);
 
-            else if (has_flags(eREADONLY, mode))
-                ::db::add_flags(SQLITE_OPEN_READONLY, flags);
+            else if (hasFlags(eREADONLY, mode))
+                ::db::addFlags(SQLITE_OPEN_READONLY, flags);
 
-            else if (has_flags(eREADWRITE, mode))
-                ::db::add_flags(SQLITE_OPEN_READWRITE, flags);
+            else if (hasFlags(eREADWRITE, mode))
+                ::db::addFlags(SQLITE_OPEN_READWRITE, flags);
 
-            else if (has_flags(eOPEN_URI, mode))
-                ::db::add_flags(SQLITE_OPEN_URI, flags);
+            else if (hasFlags(eOPEN_URI, mode))
+                ::db::addFlags(SQLITE_OPEN_URI, flags);
 
             return flags;
         }
@@ -114,15 +116,14 @@ namespace db
         inline ::sqlite3* getDevice(
             const str_t& filename,
             const eOPENMODE flags,
-            const size_t timeout,
-            const str_t& vfs)
+            const size_t timeout)
         {
             ::sqlite3* device = nullptr;
             const int ret = ::sqlite3_open_v2(
                 filename.c_str(),
                 &device,
                 ::db::adaptive(flags),
-                vfs.c_str()
+                nullptr
             );
             if (SQLITE_OK != ret)
             {
@@ -173,7 +174,7 @@ namespace db
             if(::sqlite3_get_autocommit(connector) == 0)
                 reason += "[db::disconnect] auto-commit mode must be enabled\n";
 
-            if(db::has_flags(db::eREADWRITE, flags))
+            if(db::hasFlags(db::eREADWRITE, flags))
             {
                 try
                 {
@@ -206,14 +207,18 @@ namespace db
     class connection::device
     {
     public:
-        device(const str_t& path, const eOPENMODE mode, 
-            const size_t timeout, const str_t& vfs)
+        device(const device&)            = delete;
+        device(device&&)                 = delete;
+        device& operator=(const device&) = delete;
+        device& operator=(device&&)      = delete;
+
+        device(const str_t& path, const eOPENMODE mode, const size_t timeout)
             : m_device()
             , m_cursor()
             , m_index()
             , m_flags()
         {
-            this->m_device = ::db::getDevice(path, mode, timeout, vfs);
+            this->m_device = ::db::getDevice(path, mode, timeout);
         }
 
         ~device()
@@ -246,13 +251,14 @@ namespace db
     {
         try
         {
-            this->m_data->disconnect();
+            if(this->m_data)
+                this->m_data->disconnect();
         }
         catch (const std::exception& e)
         {
             const char* reason = e.what();
             (void) reason;
-            assert(false && "exception from destructor");
+            assert(false && "(std::exception): from destructor");
         }
     }
 
@@ -279,11 +285,13 @@ namespace db
     }
 
     connection connect(const str_t& path, const eOPENMODE mode, 
-        const size_t timeout, const str_t& vfs)
+        const size_t timeout)
     {
+        using device = connection::device;
+        auto shared = ::std::make_shared<device>(path, mode, timeout);
+
         connection result;
-        result.m_data
-            = ::std::make_shared<connection::device>(path, mode, timeout, vfs);
+        result.m_data = std::move(shared);
         return result;
     }
 
@@ -291,4 +299,5 @@ namespace db
 
 //==============================================================================
 //==============================================================================
+
 
