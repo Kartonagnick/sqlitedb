@@ -59,6 +59,7 @@ TEST_COMPONENT(000)
     {
         // --- db::eREADONLY
         ASSERT_TRUE(!fileExists("no_exist.db"));
+        ASSERT_TRUE(!db::exists("no_exist.db"));
         db::connection con = db::connect("no_exist.db");
         FAIL() << "expected std::exception";
     }
@@ -75,6 +76,7 @@ TEST_COMPONENT(001)
     {
         // --- db::eREADWRITE
         ASSERT_TRUE(!fileExists("no_exist.db"));
+        ASSERT_TRUE(!db::exists("no_exist.db"));
         db::connection con 
             = db::connect("no_exist.db", db::eREADWRITE);
         FAIL() << "expected std::exception";
@@ -91,11 +93,31 @@ TEST_COMPONENT(002)
     // --- db::eCREATE
     fileDelete("test.db");
     ASSERT_TRUE(!fileExists("test.db"));
+    ASSERT_TRUE(!db::exists("test.db"));
     {
         db::connection con = db::connect("test.db", db::eCREATE);
     }
+    ASSERT_TRUE(db::exists("test.db"));
     ASSERT_TRUE(fileExists("test.db"));
     ASSERT_TRUE(fileDelete("test.db"));
+    ASSERT_TRUE(!fileExists("test.db"));
+    ASSERT_TRUE(!db::exists("test.db"));
+}
+
+TEST_COMPONENT(003)
+{
+    // --- db::eCREATE
+    fileDelete("test.db");
+    ASSERT_TRUE(!fileExists("test.db"));
+    ASSERT_TRUE(!db::exists("test.db"));
+    {
+        db::connection con = db::connect("test.db", db::eCREATE);
+    }
+    ASSERT_TRUE(db::exists("test.db"));
+    ASSERT_TRUE(fileExists("test.db"));
+    ASSERT_TRUE(db::remove("test.db"));
+    ASSERT_TRUE(!fileExists("test.db"));
+    ASSERT_TRUE(!db::exists("test.db"));
 }
 
 //==============================================================================

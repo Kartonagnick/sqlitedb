@@ -31,5 +31,6 @@
 #include <cassert>
 #include <sys/stat.h>
 
+#include <type_traits>
 #include <stdexcept>
 #include <cassert>
