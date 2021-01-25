@@ -2,6 +2,84 @@
 -----------
 
 - [x] Весь код библиотеки расположен в пространстве имен `db`  
+- [x] Вся библиотека состоит:  
+  - [x] Из нескольких глобальных функций:  
+    - [ ] [availableDatabase(filename)][0]  
+    - [ ] [existDatabase(filename)][1]  
+    - [ ] [existTable(filename, table)][2]  
+    - [ ] [existColumn(filename, table, column)][3]  
+    - [ ] [dropDatabase(filename)][4]  
+    - [ ] [dropTable(filename, table)][5]  
+    - [ ] [dropColumn(filename, table, column)][6]  
+  - [x] публичный класс db::connection.  
+    - [ ] конструктор.  
+    - [ ] деструктор.  
+    - [ ] копирование/присвоение.  
+    - [ ] operator<<  
+    - [ ] existTable(name)  
+    - [ ] existColumn(table, column)  
+    - [ ] dropTable(name)  
+    - [ ] dropColumn(table, column)  
+  - [x] и нескольких служебных классов.  
 
-Вся библиотека состоит из одного основного класса: `connection`, 
-и ряда вспомогательных, о которых пользователю даже знать не нужно.  
+[0]: #availableDatabase "true, если к база существует, и доступна"  
+[1]: #existDatabase "true, если к база существует"  
+[2]: #existTable "true, если таблица существует"  
+[3]: #existColumn "true, если столбец существует"  
+
+[4]: #dropDatabase "физически уничтожает базу данных"  
+[5]: #dropTable "физически уничтожает таблицу"  
+[6]: #dropColumn "физически уничтожает столбец"  
+
+
+
+## availableDatabase
+- [x] true, если база существует, и к ней можно успешно подключиться.  
+- [x] может бросить исключение.  
+- [x] assert(filename);  
+
+```c++
+bool availableDatabase(const char* filename);
+
+templaye<class s> 
+bool availableDatabase(const s& filename);
+```
+
+## existDatabase
+- [x] если база существует, вернет true.  
+- [x] может бросить исключение.  
+
+```c++
+bool existDatabase(const char*  filename);
+
+templaye<class s> 
+bool existDatabase(const s& filename);
+```
+
+## existColumn
+```c++
+bool existColumn(const chat* filename, const char* column);
+
+templaye<class s1, class s2> 
+bool existColumn(const s1& filename, const s2& column);
+```
+Возвразают `true`, если в указанной базе данных существует указанный столбец.  
+
+
+## dropDatabase  
+## dropTable  
+## dropColumn   
+
+
+
+
+
+db::connection  
+--------------
+Главный класс библиотеки.  
+Служит для подключения к базе данных, 
+и осуществления различных запросов.  
+
+  - [x] Гарантирует Thread-Safe.  
+
+
