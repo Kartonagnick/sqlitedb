@@ -2,6 +2,10 @@
 #pragma once
 
 #ifdef _MSC_VER
+    #pragma message("pch -> enabled")
+    #include <sqlitedb/confbuild.hpp>
+    #pragma message("sqlitedb: " dFULL_VERSION)
+
     #ifdef STABLE_RELEASE
         #pragma message("Build stable release version")
     #else

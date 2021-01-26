@@ -1,7 +1,7 @@
 
 // [2021y-01m-23d] Idrisov Denis R.
 
-#include <sqlitedb/sqlitedb.hpp>
+#include <sqlitedb/connection.hpp>
 #include "device.hpp"
 #include <cassert>
 
@@ -17,7 +17,7 @@ namespace db
     {
         try
         {
-            if(this->m_data)
+            if (this->m_data)
                 this->m_data->disconnect();
         }
         catch (const std::exception& e)
@@ -50,18 +50,18 @@ namespace db
         return *this;
     }
 
-    stmt connection::operator << (const str_t& sql) const noexcept
+    request connection::operator << (const str_t& sql) const
     {
         auto& device = *this->m_data;
         auto* cursor = device.begQuery(sql);
-        return stmt(cursor);
+        return request(cursor);
     }
 
-    stmt connection::operator << (const char* sql) const noexcept
+    request connection::operator << (const char* sql) const
     {
         auto& device = *this->m_data;
         auto* cursor = device.begQuery(sql);
-        return stmt(cursor);
+        return request(cursor);
     }
 
 } // namespace db
@@ -70,13 +70,28 @@ namespace db
 //==============================================================================
 namespace db
 {
-    void connection::dropTable(const str_t& table) const noexcept
+    void connection::dropTable(const str_t& table) const
     {
         const str_t sql = "DROP TABLE IF EXISTS " + table;
         *this << sql;
     }
 
-    bool connection::existTable(const char* name) const noexcept
+
+    void connection::dropColumn(const str_t& table, const str_t& column) const
+    {
+        (void) table;
+        (void) column;
+        throw std::runtime_error("in developmant");
+        #if 0
+        - create new table as the one you are trying to change,
+        - copy all data,
+        - drop old table,
+        - rename the new one.
+        #endif
+    }
+
+
+    bool connection::existTable(const char* name) const
     {
         assert(name);
         const char* sql 
@@ -85,14 +100,17 @@ namespace db
 
         size_t count = 0;
         const auto lambda = [&count](const size_t v) noexcept
-            { count = v; };
+        { 
+            count = v; 
+            return true;
+        };
 
-        *this << sql << name >> count;
+        *this << sql << name >> lambda;
         assert(count == 0 || count == 1);
         return count != 0;
     }
 
-    bool connection::existColumn(const char* table, const char* column) const noexcept
+    bool connection::existColumn(const char* table, const char* column) const
     {
         assert(table);
         assert(column);
@@ -101,10 +119,13 @@ namespace db
 
         size_t count = 0;
         const auto lambda = [&count](const size_t v) noexcept
-            { count = v; };
+        {
+            count = v; 
+            return true;
+        };
 
         *this << sql << table << column
-            >> count;
+            >> lambda;
         assert(count == 0 || count == 1);
         return count != 0;
     }
@@ -113,4 +134,19 @@ namespace db
 
 //==============================================================================
 //==============================================================================
+namespace db
+{
+    connection connect(const str_t& path, const eOPENMODE mode, 
+        const size_t timeout)
+    {
+        auto shared = ::std::make_shared<db::device>(path, mode, timeout);
+        assert(shared);
+        connection result;
+        result.m_data = std::move(shared);
+        return result;
+    }
 
+} // namespace db
+
+//==============================================================================
+//==============================================================================

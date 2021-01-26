@@ -20,9 +20,14 @@
     // #define TEST_CLASSIC                                 // ready!
 //==============================================================================
 //===== sqlitedb ===========================================||==================
-    #define TEST_CONSTRUCTORS                               // ready!
-    #define TEST_TABLE                                      // ready!
-    #define TEST_CONTENT                                    // in progress...
+    #define TEST_STAFF                                      // ready!
+    //#define TEST_EXISTS                                     // ready!
+
+    // #define TEST_CONSTRUCT                                  // ready!
+
+
+    // #define TEST_TABLE                                      // in progress...
+    // #define TEST_CONTENT                                    // in progress...
 //==========================================================||==================
 //==============================================================================
 

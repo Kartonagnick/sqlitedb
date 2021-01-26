@@ -3,19 +3,19 @@
 //==============================================================================
 //==============================================================================
 
-#include <sqlitedb/database.hpp>
+#include <sqlitedb/management.hpp>
 #include <sys/stat.h>
 #include <cassert>
 #include <string>
 
 namespace db
 {
-    #ifdef WIN32 
+    #ifdef _WIN32 
         #define dSTATE64  _stat64
         #define dWSTATE64 _wstat64
     #else
         #define dSTATE64 stat64
-    #endif //!WIN32
+    #endif
 
 } // namespace db
 

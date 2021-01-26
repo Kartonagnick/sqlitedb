@@ -1,7 +1,7 @@
 
 // [2021y-01m-23d] Idrisov Denis R.
 
-#include <sqlitedb/stmt.hpp>
+#include <sqlitedb/request.hpp>
 #include "numeric_cast.hpp"
 #include <sqlite3.h>
 #include "device.hpp"
@@ -13,18 +13,12 @@
 //===[integer] ====================================================================
 namespace db
 {
-    using stmtT = ::sqlite3_stmt;
     using sizeT = ::std::atomic_size_t;
+    using stmtT = ::sqlite3_stmt;
 
-    inline int integer(const size_t value) noexcept
+    static inline int integer(const size_t value) noexcept
     {
         return ::tools::assert_numeric_cast<int>(value);
-    }
-
-    inline stmtT* cursor(void* ptr) noexcept
-    {
-        assert(ptr);
-        return static_cast<stmtT*>(ptr);
     }
 
 } // namespace db
@@ -83,7 +77,7 @@ namespace db
 //===[connection::data] ========================================================
 namespace db
 {
-    stmt::stmt(stmt&& rhs) noexcept
+    request::request(request&& rhs) noexcept
         : m_cursor(rhs.m_cursor)
         , m_index(m_index.load())
     {
@@ -91,49 +85,47 @@ namespace db
         rhs.m_index  = 0;
     }
 
-    stmt::stmt(void* cursor) noexcept
+    request::request(stmtT* cursor) noexcept
         : m_cursor(cursor)
         , m_index(1)
     {}
 
-    stmt::~stmt()
+    request::~request()
     {
         this->endQuery();
     }
 
-    bool stmt::next() 
+    bool request::next() 
     { 
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);        
-        const auto result = ::sqlite3_step(cur);
+        const auto result = ::sqlite3_step(this->m_cursor);
         assert(result == SQLITE_ROW || result == SQLITE_DONE);
         if (result != SQLITE_ROW && result != SQLITE_DONE)
             throw std::runtime_error("[db::next] sqlite3_step: failed");
         return result == SQLITE_ROW;
     }
 
-    void stmt::endQuery() noexcept 
+    void request::endQuery() noexcept 
     { 
         if(!this->m_cursor)
         {
             assert(this->m_index  == 0);
             return;
         }
-        auto* cur = ::db::cursor(this->m_cursor);        
-        
         this->next();
-        const auto ret = ::sqlite3_finalize(cur);
+        const auto ret = ::sqlite3_finalize(this->m_cursor);
         assert(ret == SQLITE_OK);
+		(void) ret;
         this->m_cursor = nullptr;
         this->m_index  = 0;
     }
 
-    void stmt::bind(const void* value, const size_t size) noexcept
+    void request::bind(const void* value, const size_t size) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         const int ret = ::sqlite3_bind_blob(
-            ::db::cursor(this->m_cursor), 
+            this->m_cursor, 
             ::db::integer(this->m_index), 
             value, 
             ::db::integer(size), 
@@ -143,12 +135,12 @@ namespace db
         (void)ret;
     }
 
-    void stmt::bind(const ::std::nullptr_t) noexcept
+    void request::bind(const ::std::nullptr_t) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         const auto ret = ::sqlite3_bind_null(
-            ::db::cursor(this->m_cursor), 
+            this->m_cursor, 
             ::db::integer(this->m_index)
         );
         assert(ret == SQLITE_OK);
@@ -156,34 +148,34 @@ namespace db
         ++this->m_index;
     }
 
-    void stmt::bind(const char* value) noexcept
+    void request::bind(const char* value) noexcept
     {
         assert(this->m_index > 0);
         assert(value);
         assert(this->m_cursor);
         ::db::bindText(
-            ::db::cursor(this->m_cursor), 
-            ::db::integer(this->m_index),
+            this->m_cursor, 
+            this->m_index,
             value, 
             std::strlen(value)
         );
         ++this->m_index;
     }
 
-    void stmt::bind(const str_t& value) noexcept
+    void request::bind(const str_t& value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         ::db::bindText(
-            ::db::cursor(this->m_cursor), 
-            ::db::integer(this->m_index),
+            this->m_cursor, 
+            this->m_index,
             value.c_str(), 
             value.length()
         );
         ++this->m_index;
     }
                                                  
-    void stmt::bind(const float value) noexcept
+    void request::bind(const float value) noexcept
     {
         assert(this->m_cursor);
         assert(this->m_index > 0);
@@ -191,12 +183,12 @@ namespace db
         this->bind(v);
     }
 
-    void stmt::bind(const double value) noexcept
+    void request::bind(const double value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         const int ret = ::sqlite3_bind_double(
-            ::db::cursor(this->m_cursor), 
+            this->m_cursor, 
             ::db::integer(this->m_index),
             value
         );
@@ -205,7 +197,7 @@ namespace db
         ++this->m_index;
     }
     
-    void stmt::bind(const bool value) noexcept
+    void request::bind(const bool value) noexcept
     {
         assert(this->m_cursor);
         assert(this->m_index > 0);
@@ -213,68 +205,60 @@ namespace db
         return this->bind(v);
     }
 
-    void stmt::bind(const ::std::int8_t value) noexcept
+    void request::bind(const ::std::int8_t value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        ::db::bindIntTemplate(cur, this->m_index, value);
+        ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void stmt::bind(const ::std::int16_t value) noexcept
+    void request::bind(const ::std::int16_t value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        ::db::bindIntTemplate(cur, this->m_index, value);
+        ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void stmt::bind(const ::std::int32_t value) noexcept
+    void request::bind(const ::std::int32_t value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        ::db::bindIntTemplate(cur, this->m_index, value);
+        ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void stmt::bind(const ::std::int64_t value) noexcept
+    void request::bind(const ::std::int64_t value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        ::db::bindIntTemplate(cur, this->m_index, value);
+        ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void stmt::bind(const ::std::uint8_t value) noexcept
+    void request::bind(const ::std::uint8_t value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        ::db::bindIntTemplate(cur, this->m_index, value);
+        ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void stmt::bind(const ::std::uint16_t value) noexcept
+    void request::bind(const ::std::uint16_t value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        ::db::bindIntTemplate(cur, this->m_index, value);
+        ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void stmt::bind(const ::std::uint32_t value) noexcept
+    void request::bind(const ::std::uint32_t value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        ::db::bindIntTemplate(cur, this->m_index, value);
+        ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void stmt::bind(const ::std::uint64_t value) noexcept
+    void request::bind(const ::std::uint64_t value) noexcept
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        ::db::bindIntTemplate(cur, this->m_index, value);
+        ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
 } // namespace db
@@ -284,152 +268,139 @@ namespace db
 
 namespace db
 {
-    int stmt::get_type(const size_t index) noexcept
+    int request::get_type(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         return ::sqlite3_column_type(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
     }
 
-    const void* stmt::get_blob(const size_t index) noexcept
+    const void* request::get_blob(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         return ::sqlite3_column_blob(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
     }
 
-    size_t stmt::get_bytes(const size_t index) noexcept
+    size_t request::get_bytes(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
-        return ::sqlite3_column_bytes(
-            cur, ::db::integer(index)
+        const auto bytes = ::sqlite3_column_bytes(
+            this->m_cursor, ::db::integer(index)
         );
+        assert(bytes >= 0);
+        return ::tools::assert_numeric_cast<size_t>(bytes);
     }
 
-    str_t stmt::get_text(const size_t index) noexcept
+    str_t request::get_text(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto* result = ::sqlite3_column_text(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         assert(result);
         return reinterpret_cast<const char*>(result);
     }
 
-    double stmt::get_double(const size_t index) noexcept
+    double request::get_double(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         return ::sqlite3_column_double(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
     }
 
-    float stmt::get_float(const size_t index) noexcept
+    float request::get_float(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_double(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         return ::tools::numeric_cast<float>(result);
     }
 
-    bool stmt::get_bool(const size_t index) noexcept
+    bool request::get_bool(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         return result != 0;
     }
 
-    ::std::int8_t stmt::get_int8(const size_t index) noexcept
+    ::std::int8_t request::get_int8(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         return ::tools::numeric_cast<::std::int8_t>(result);
     }
 
-    ::std::int16_t stmt::get_int16(const size_t index) noexcept
+    ::std::int16_t request::get_int16(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         return ::tools::numeric_cast<::std::int16_t>(result);
     }
 
-    ::std::int32_t stmt::get_int32(const size_t index) noexcept
+    ::std::int32_t request::get_int32(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         return ::tools::numeric_cast<::std::int32_t>(result);
     }
 
-    ::std::int64_t stmt::get_int64(const size_t index) noexcept
+    ::std::int64_t request::get_int64(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int64(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         return ::tools::numeric_cast<::std::int64_t>(result);
     }
 
-    ::std::uint8_t stmt::get_uint8(const size_t index) noexcept
+    ::std::uint8_t request::get_uint8(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         assert(result >= 0);
         return ::tools::numeric_cast<::std::uint8_t>(result);
     }
 
-    ::std::uint16_t stmt::get_uint16(const size_t index) noexcept
+    ::std::uint16_t request::get_uint16(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         assert(result >= 0);
         return ::tools::numeric_cast<::std::uint16_t>(result);
     }
 
-    ::std::uint32_t stmt::get_uint32(const size_t index) noexcept
+    ::std::uint32_t request::get_uint32(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         assert(result >= 0);
         return ::tools::numeric_cast<::std::uint32_t>(result);
     }
 
-    ::std::uint64_t stmt::get_uint64(const size_t index) noexcept
+    ::std::uint64_t request::get_uint64(const size_t index) noexcept
     {
         assert(this->m_cursor);
-        auto* cur = ::db::cursor(this->m_cursor);
         const auto result = ::sqlite3_column_int64(
-            cur, ::db::integer(index)
+            this->m_cursor, ::db::integer(index)
         );
         assert(result >= 0);
         return ::tools::numeric_cast<::std::uint64_t>(result);

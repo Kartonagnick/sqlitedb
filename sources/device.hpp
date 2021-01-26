@@ -5,9 +5,11 @@
 #ifndef dSQLITEDB_DEVICE_USED_ 
 #define dSQLITEDB_DEVICE_USED_ 1
 
-#include <sqlitedb/connect.hpp>
-#include <atomic>
+#include <sqlitedb/connection.hpp>
+#include <mutex>
+
 struct sqlite3;
+struct sqlite3_stmt;
 //==============================================================================
 //==============================================================================
 namespace db
@@ -16,7 +18,7 @@ namespace db
 
     class device
     {
-        using sizeT = ::std::atomic_size_t;
+        using mutexT = ::std::mutex;
         using stmtT = ::sqlite3_stmt;
         friend class connection;
     public:
@@ -38,6 +40,7 @@ namespace db
         stmtT* begQuery(const char*  sql);
         stmtT* begQuery(const str_t& sql);
     private:
+        mutexT   m_mutex;
         sqlite3* m_device;
         int      m_flags;
     };

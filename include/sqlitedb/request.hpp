@@ -2,15 +2,18 @@
 // [2021y-01m-23d] Idrisov Denis R.
 
 #pragma once
-#ifndef ddSQLITEDB_STMP_USED_ 
-#define ddSQLITEDB_STMP_USED_ 1
+#ifndef dSQLITEDB_REQUEST_USED_ 
+#define dSQLITEDB_REQUEST_USED_ 1
 
+#include <type_traits>
 #include <cstdint>
 #include <string>
 #include <atomic>
 
+struct sqlite3_stmt;
+
 //==============================================================================
-//===[connection::data] ========================================================
+//==============================================================================
 namespace db
 {
     template<class T> class getval;
@@ -18,38 +21,38 @@ namespace db
     class connection;
     class cursor;
 
-    class stmt
+    class request
     {
+        template<class T> 
+        friend class getval;
         friend class connection;
         friend class cursor;
 
-        template<class T> 
-        friend class getval;
-
         using sizeT = ::std::atomic_size_t;
+        using stmtT = ::sqlite3_stmt;
     public:
-        stmt(stmt&&) noexcept;
+        request(const request&)            = delete;
+        request& operator=(const request&) = delete;
+        request& operator=(request&&)      = delete;
 
-        stmt(const stmt&)            = delete;
-        stmt& operator=(const stmt&) = delete;
-        stmt& operator=(stmt&&)      = delete;
-
-        ~stmt();
-
+       ~request();
     public:
         template<class T>
-        stmt& operator << (T&& value) noexcept
+        request& operator << (T&& value) noexcept
         { 
             this->bind(::std::forward<T>(value));
             return *this;
         }
 
         template<class T>
-        decltype(auto) operator >> (T&& dst);
+        void operator >> (T&& dst);
 
-        template<class T> T getValue(const size_t index)
+    private:
+        template<class T> auto getValue(const size_t index)
         { 
-            using from = db::getval<T>;
+            using y = ::std::remove_reference_t<T>;
+            using x = ::std::remove_cv_t<y>;
+            using from = db::getval<x>;
             return from::get(*this, index);
         }
     private:
@@ -90,21 +93,23 @@ namespace db
         ::std::uint32_t get_uint32(const size_t index) noexcept;
         ::std::uint64_t get_uint64(const size_t index) noexcept;
     private:
-        stmt(void* cursor) noexcept;
-        void endQuery() noexcept;
+        request(request&&)     noexcept;
+        request(stmtT* cursor) noexcept;
+        void endQuery()        noexcept;
         bool next();
     private:
-        void*  m_cursor;
+        stmtT* m_cursor;
         sizeT  m_index;
     };
 
 
-    #define dGETVALUE_DB(type, method)                            \
-    template<> class getval<type>                                 \
-    {                                                             \
-        public:                                                   \
-        static type get(stmt& owner, const size_t index) noexcept \
-            { return owner.get_##method(index); }                 \
+    #define dGETVALUE_DB(type, method)                       \
+    template<> class getval<type>                            \
+    {                                                        \
+        public:                                              \
+        static type                                          \
+            get(request& owner, const size_t index) noexcept \
+                { return owner.get_##method(index); }        \
     }
 
     dGETVALUE_DB(db::str_t    , text  );
@@ -128,13 +133,9 @@ namespace db
 namespace db
 {
     template<class T>
-    decltype(auto) stmt::operator >> (T&& dst)  
+    void request::operator >> (T&& dst)  
     { 
-        //const bool success = owner.endQuery();
-        //assert(success);
-        //(void)success;
-
-        return cursor::template get<T>(
+        cursor::template get<T>(
             *this, std::forward<T>(dst)
         );
     }
@@ -143,4 +144,4 @@ namespace db
 
 //==============================================================================
 //==============================================================================
-#endif // !ddSQLITEDB_STMP_USED_
+#endif // !dSQLITEDB_REQUEST_USED_

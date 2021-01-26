@@ -2,10 +2,9 @@
 // [2021y-01m-24d] Idrisov Denis R.
 
 #pragma once
-#ifndef ddSQLITEDB_CURSOR_USED_ 
-#define ddSQLITEDB_CURSOR_USED_ 1
+#ifndef dSQLITEDB_CURSOR_USED_ 
+#define dSQLITEDB_CURSOR_USED_ 1
 
-#include <sqlitedb/stmt.hpp>
 #include <type_traits>
 #include <cassert>
 #include <tuple>
@@ -29,8 +28,8 @@ namespace db
             using checked
                 = decltype(check<x>(nullptr));
         public:
+           ~is_lambda() = delete;
             is_lambda() = delete;
-            ~is_lambda() = delete;
 
             enum { value = checked::value };
         };
@@ -40,32 +39,30 @@ namespace db
             enum { value = false };
         };
 
-        template <class... Args>
-        struct get_lambda< ::std::tuple<Args...> >
+        template <class... Args> struct get_lambda< ::std::tuple<Args...> >
         {
             enum { value = true };
             using type = ::std::tuple<Args...>;
-            static auto gen(type& t) noexcept 
+            static auto make(type& t) noexcept 
             {
                 return [&t](const Args&... args)
                 {
                     t = ::std::tie(args...);
-                    return true;
+                    return false;
                 };
             }
         };
 
-        template <class... Args>
-        struct get_lambda< ::std::tuple<Args&...> >
+        template <class... Args> struct get_lambda< ::std::tuple<Args&...> >
         {
             enum { value = true };
             using type = ::std::tuple<Args&...>;
-            static auto gen(type& t) noexcept
+            static auto make(type& t) noexcept
             {
                 return [&t](const Args&...args)
                 {
                     t = ::std::tie(args...);
-                    return true;
+                    return false;
                 };
             }
         };
@@ -79,18 +76,22 @@ namespace db
             enum { other  = !lambda && !tuple };
         };
 
-        #define dFOR_(name) \
+        #define dFOR_SQLITEDB(name) \
             ::std::enable_if_t<::db::detail::help<T>::name>
 
     } // namespace detail
 
+    class request;
+
     class cursor
     {
-    public:
-        template<class T>
-        static dFOR_(other) get(stmt& owner, T&& dst)
+        friend class request;
+
+        template<class Request, class T>
+        static dFOR_SQLITEDB(other) get(Request& owner, T&& dst)
         { 
-            using x = std::remove_reference_t<T>;
+            using y = ::std::remove_reference_t<T>;
+            using x = ::std::remove_cv_t<y>;
             const auto yes = owner.next();
             assert(yes);
             dst = owner.template getValue<x>(0);
@@ -98,50 +99,65 @@ namespace db
         }
 
         template<class T>
-        static dFOR_(lambda) get(stmt& owner, T&& dst)
+        static dFOR_SQLITEDB(lambda) get(request& owner, T&& dst)
         { 
             const auto count = cursor::template loop(owner, dst);
             (void) count;
         }
 
         template<class T>
-        static dFOR_(tuple) get(stmt& owner, T&& dst)
+        static dFOR_SQLITEDB(tuple) get(request& owner, T&& dst)
         { 
             using agent = detail::get_lambda<T>;
-            const auto& lambda = agent::gen(dst);
+            const auto& lambda = agent::make(dst);
             const auto count = cursor::template loop(owner, lambda);
             assert(count < 2);
             (void) count;
         }
 
-        template<class Lambda> 
-        static size_t loop(stmt& owner, const Lambda& lambda)
+        #undef dFOR_SQLITEDB
+    private:
+        template<class Request, class Lambda> 
+        static size_t loop(Request& owner, const Lambda& lambda)
         {
             static_assert(
                 detail::is_lambda<Lambda>::value,
                 "excpect 'lambda'"
             );
+
+            using x = decltype(
+                cursor::template call(owner, lambda, &Lambda::operator())
+            );
+
+            static_assert(
+                ::std::is_same<x, bool>::value,
+                "the 'lambda' should return 'bool'"
+            );
+
             size_t count = 0;
             while(owner.next())
             {
-                if(!cursor::template call(owner, lambda, &Lambda::operator()))
+                const bool continue_
+                    = cursor::template call(owner, lambda, &Lambda::operator());
+
+                if(!continue_)
                     break;
+
                 ++count;
             }
             return count;
         }
 
-    private:
-        template<class T> 
-        static auto getArg(stmt& owner, const size_t index) 
+        template<class Request, class T> 
+        static auto getArg(Request& owner, const size_t index) 
         { 
-            using x = ::std::remove_reference_t<T>;
-            using arg_t = ::std::remove_cv_t<x>;
-            return owner.getValue<arg_t>(index);
+            using y = ::std::remove_reference_t<T>;
+            using x = ::std::remove_cv_t<y>;
+            return owner.template getValue<x>(index);
         }
 
         template<class R, class Obj, class ...Args, size_t ...N>
-        static R callimpl(stmt& owner, 
+        static R callimpl(request& owner, 
             const Obj& obj, 
             R(Obj::*method)(Args...)const, 
             const ::std::index_sequence<N...> )
@@ -150,13 +166,13 @@ namespace db
 
             return (obj.*method)( 
                 cursor::template getArg< 
-                    ::std::tuple_element_t<N, tuple_t> 
+                    request, ::std::tuple_element_t<N, tuple_t> 
                 >(owner, N)... 
             );
         }
 
         template<class R, class Obj, class...Args> 
-        static R call(stmt& owner, const Obj& obj, 
+        static R call(request& owner, const Obj& obj, 
             R(Obj::*method)(Args...) const)
         {
             enum { count = sizeof...(Args) };
@@ -171,4 +187,4 @@ namespace db
 
 //==============================================================================
 //==============================================================================
-#endif // !ddSQLITEDB_STMP_USED_
+#endif // !dSQLITEDB_CURSOR_USED_

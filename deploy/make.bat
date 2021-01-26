@@ -8,14 +8,17 @@ rem ============================================================================
     @echo [MAKE] run...
 
     rem set "eDEBUG=ON"
-    set "order=msvc:64:debug:dynamic"
-    rem set "order=mingw:64:debug:static"
+
+    set "VC=msvc:64:debug:dynamic"
+    set "MG=mingw:64:debug:static"
+    set "order=%VC%"
+    rem set "order=%VC%; %MG%"
     rem set "order=all"
 
     rem for development
     (call :generate) && (goto :success) || (goto :failed)
 
-rem    (call :clean)    || (goto :failed)
+    (call :clean)    || (goto :failed)
     (call :build)    || (goto :failed)
     (call :runTests) || (goto :failed)
     (call :install)  || (goto :failed)

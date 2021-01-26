@@ -29,7 +29,7 @@ namespace db
         const str_t& cast(const str_t& v) noexcept
             { return v; }
 
-        str_t cast(const char* v) noexcept
+        str_t cast(const char* v) 
         {
             assert(v);
             return v;
@@ -263,7 +263,8 @@ namespace db
 namespace db
 {
     device::device(const str_t& filename, const eOPENMODE mode, const size_t timeout)
-        : m_device()
+        : m_mutex()
+        , m_device()
         , m_flags()
     {
         assert(!filename.empty());
@@ -273,15 +274,24 @@ namespace db
 
     device::~device()
     {
+        this->disconnect();
         assert(!this->m_device);
     }
     void device::disconnect() 
     {
+        ::std::lock_guard<std::mutex> 
+            lock(this->m_mutex);
+
+        if (!this->m_device)
+            return;
         ::db::disconnect(this->m_device, this->m_flags);
     }
 
     stmtT* device::begQuery(const str_t& sql)
     {
+        ::std::lock_guard<std::mutex> 
+            lock(this->m_mutex);
+
         assert(!sql.empty());
         assert(this->m_device);
         return ::db::begQuery(this->m_device, sql);
@@ -289,6 +299,9 @@ namespace db
 
     stmtT* device::begQuery(const char* sql)  
     {
+        ::std::lock_guard<std::mutex> 
+            lock(this->m_mutex);
+
         assert(sql);
         assert(*sql != '\0');
         assert(this->m_device);

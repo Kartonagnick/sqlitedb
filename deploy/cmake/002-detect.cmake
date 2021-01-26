@@ -3,6 +3,7 @@
 # 2020y-12m-21d. WorkSpace project.
 # 2021y-01m-12d. WorkSpace project.
 # 2021y-01m-13d. WorkSpace project.
+# 2021y-01m-26d. WorkSpace project.
 ################################################################################
 ################################################################################
 
@@ -23,6 +24,17 @@ function(detect_dir_sources)
 endfunction()
 
 function(detect_dir_workspace)
+
+    set(start "$ENV{eDIR_WORKSPACE}")
+    if(IS_DIRECTORY "${start}")
+        find_symptoms(result "${start}" "3rd_party" "programs" "scripts")
+        if(result)
+            get_filename_component(result "${result}" ABSOLUTE)
+            set(gDIR_WORKSPACE "${result}" PARENT_SCOPE)
+            return()
+        endif()
+    endif()
+
     if(IS_DIRECTORY "${gDIR_SOURCE}")
         set(start "${gDIR_SOURCE}")
     else()
