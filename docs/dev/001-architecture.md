@@ -4,12 +4,12 @@
 - [x] Весь код библиотеки расположен в пространстве имен `db`  
 - [x] Вся библиотека состоит:  
   - [ ] Нескольких функций управления (management.hpp):  
-    - [ ] [db::availableDatabase(filename)][1]  
-    - [ ] [db::existDatabase(filename)][2]  
-    - [ ] [db::existTable(filename, table)][3]  
-    - [ ] [db::existColumn(filename, table, column)][4]  
-    - [ ] [db::dropDatabase(filename)][5]  
-    - [ ] [db::dropTable(filename, table)][6]  
+    - [x] [db::availableDatabase(filename)][1]  
+    - [x] [db::existDatabase(filename)][2]  
+    - [x] [db::existTable(filename, table)][3]  
+    - [x] [db::existColumn(filename, table, column)][4]  
+    - [x] [db::dropDatabase(filename)][5]  
+    - [x] [db::dropTable(filename, table)][6]  
     - [ ] [db::dropColumn(filename, table, column)][7]  
   - [x] Функция создания соединения:  
     - [ ] [db::connect(filename, params...)][8]  

@@ -19,6 +19,22 @@
 //===== modern/classic =====================================||==================
     #define TEST_MODERN                                     // ready!
     #define TEST_CLASSIC                                    // ready!
+//==============================================================================
+//===== sqlitedb/staff =====================================||==================
+    #define TEST_STAFF                                      // ready!
+//==============================================================================
+//===== sqlitedb/management ================================||==================
+    #define TEST_EXISTS                                     // ready!
+    #define TEST_REMOVE                                     // ready!
+    #define TEST_EXISTS_DATABASE                            // ready!
+    #define TEST_AVAILABLE_DATABASE                         // ready!
+    #define TEST_EXISTS_TABLE                               // ready!
+    #define TEST_EXISTS_COLUMN                              // ready!
+    #define TEST_DROP_DATABASE                              // ready!
+    #define TEST_DROP_TABLE                                 // ready!
+//==============================================================================
+//===== sqlitedb/connect ===================================||==================
+    // #define TEST_CONNECT                                 // ready!
 //==========================================================||==================
 //==============================================================================
 

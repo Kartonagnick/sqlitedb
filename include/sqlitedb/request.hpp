@@ -35,10 +35,10 @@ namespace db
         request& operator=(const request&) = delete;
         request& operator=(request&&)      = delete;
 
-       ~request();
+       ~request() noexcept(false);
     public:
         template<class T>
-        request& operator << (T&& value) noexcept
+        request& operator << (T&& value) noexcept 
         { 
             this->bind(::std::forward<T>(value));
             return *this;
@@ -95,7 +95,7 @@ namespace db
     private:
         request(request&&)     noexcept;
         request(stmtT* cursor) noexcept;
-        void endQuery()        noexcept;
+        void endQuery();
         bool next();
     private:
         stmtT* m_cursor;
@@ -133,7 +133,7 @@ namespace db
 namespace db
 {
     template<class T>
-    void request::operator >> (T&& dst)  
+    void request::operator >> (T&& dst)
     { 
         cursor::template get<T>(
             *this, std::forward<T>(dst)

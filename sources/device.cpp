@@ -1,6 +1,7 @@
 
 // [2021y-01m-23d] Idrisov Denis R.
 
+#include "exception.hpp"
 #include "device.hpp"
 #include <sqlite3.h>
 #include <stdexcept>
@@ -49,12 +50,12 @@ namespace db
     // flags
     namespace
     {
-        // true, если все указанные в my включены в flags
+        // true, РµСЃР»Рё РІСЃРµ СѓРєР°Р·Р°РЅРЅС‹Рµ РІ my РІРєР»СЋС‡РµРЅС‹ РІ flags
         inline bool hasFlags(const int my, const int flags) noexcept
             { return (my & flags) == my; }
 
         #if 0
-        // true, если любой, из указаннных в my, включен в flags
+        // true, РµСЃР»Рё Р»СЋР±РѕР№, РёР· СѓРєР°Р·Р°РЅРЅРЅС‹С… РІ my, РІРєР»СЋС‡РµРЅ РІ flags
         inline bool hasAnyFlags(const int my, const int flags) noexcept
             { return (my & flags) != 0; }
         #endif
@@ -129,6 +130,7 @@ namespace db
             if (ret_code == SQLITE_OK)
                 return;
 
+
             assert(err_msg);
             const str_t msg_ = err_msg;
             const str_t sql_ = sql;
@@ -137,7 +139,7 @@ namespace db
                 = "[db::execSQL] '" + sql_ + "' (" + msg_ + ")";
 
             ::sqlite3_free(err_msg);
-            throw std::runtime_error(reason);
+            throw db::exception(ret_code, reason);
         }
 
         void disconnect(::sqlite3*& device, const int flags) 
@@ -250,10 +252,67 @@ namespace db
 
             const str_t reason = "[db::begQuery] "
                 "sqlite3_prepare_v2(" + db::cast(sql) + "): " + msg;
-            throw std::runtime_error(reason);
+
+            const int result 
+                = std::strncmp(msg.c_str(), "no such table: ", 15);
+
+            if(result == 0)
+                throw db::exception(db::exception::eTABLE_DOES_NOT_EXIST, reason);
+            throw db::exception(ret, reason);
         }
 
     } //namespace
+
+    const char* code2desc(const int code) noexcept
+    {
+        const auto* msg =  ::sqlite3_errstr(code);
+        assert(msg);
+        return msg;
+    }
+
+    const char* code2text(const int code) noexcept
+    {
+        #define dSQLITE_CODE(code) case code: return #code
+        switch (code)
+        {
+            dSQLITE_CODE(SQLITE_OK);
+            dSQLITE_CODE(SQLITE_ERROR);
+            dSQLITE_CODE(SQLITE_INTERNAL);
+            dSQLITE_CODE(SQLITE_PERM);
+            dSQLITE_CODE(SQLITE_ABORT);
+            dSQLITE_CODE(SQLITE_BUSY);
+            dSQLITE_CODE(SQLITE_LOCKED);
+            dSQLITE_CODE(SQLITE_NOMEM);
+            dSQLITE_CODE(SQLITE_READONLY);
+            dSQLITE_CODE(SQLITE_INTERRUPT);
+            dSQLITE_CODE(SQLITE_IOERR);
+            dSQLITE_CODE(SQLITE_CORRUPT);
+            dSQLITE_CODE(SQLITE_NOTFOUND);
+            dSQLITE_CODE(SQLITE_FULL);
+            dSQLITE_CODE(SQLITE_CANTOPEN);
+            dSQLITE_CODE(SQLITE_PROTOCOL);
+            dSQLITE_CODE(SQLITE_EMPTY);
+            dSQLITE_CODE(SQLITE_SCHEMA);
+            dSQLITE_CODE(SQLITE_TOOBIG);
+            dSQLITE_CODE(SQLITE_CONSTRAINT);
+            dSQLITE_CODE(SQLITE_MISMATCH);
+            dSQLITE_CODE(SQLITE_MISUSE);
+            dSQLITE_CODE(SQLITE_NOLFS);
+            dSQLITE_CODE(SQLITE_AUTH);
+            dSQLITE_CODE(SQLITE_FORMAT);
+            dSQLITE_CODE(SQLITE_RANGE);
+            dSQLITE_CODE(SQLITE_NOTADB);
+            dSQLITE_CODE(SQLITE_NOTICE);
+            dSQLITE_CODE(SQLITE_WARNING);
+            dSQLITE_CODE(SQLITE_ROW);
+            dSQLITE_CODE(SQLITE_DONE);
+
+            #undef dSQLITE_CODE
+        default:
+            assert(false && "invalid-switch-case");
+        }
+        return "invalid-switch-case";
+    }
 
 } // namespace db
 

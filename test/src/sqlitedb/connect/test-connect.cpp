@@ -1,74 +1,49 @@
 
 #include <mygtest/modern.hpp>
-#include <sqlitedb/sqlitedb.hpp>
 //==============================================================================
 //==============================================================================
 
-#ifdef TEST_CONSTRUCT
+#ifdef TEST_CONNECT
 
 #define dTEST_COMPONENT db, connection
-#define dTEST_METHOD construct
+#define dTEST_METHOD connect
 #define dTEST_TAG tdd
 
+#include <sqlitedb/connection.hpp>
+#include "test-staff.hpp"
+namespace staff = staff_sqlitedb;
 namespace me = db;
-
 //==============================================================================
 //==============================================================================
 
-#include <string>
-#include <cassert>
-#include <sys/stat.h>
-
-namespace test_construct
-{
-    #ifdef _WIN32 
-        #define dSTATE64  _stat64
-        #define dWSTATE64 _wstat64
-    #else
-        #define dSTATE64 stat64
-    #endif 
-
-    using str_t = std::string;
-
-    inline bool fileDelete(const str_t filename) noexcept
-    {
-        const bool success
-            = ::remove(filename.c_str()) == 0;
-        return success;
-    }
-
-    inline bool fileExists(const str_t& filename) noexcept
-    {
-        struct dSTATE64 info;
-        const auto re = ::dSTATE64(filename.c_str(), &info);
-        if (re != 0)
-            return false;
-        const bool success = (info.st_mode & S_IFREG) != 0;
-        return  success;
-    }
-
-} // namespace test_construct
-using namespace test_construct;
-
-//==============================================================================
-//==============================================================================
-
+// --- db::eREADONLY
 TEST_COMPONENT(000)
 {
-    try
-    {
-        // --- db::eREADONLY
-        ASSERT_TRUE(!fileExists("no_exist.db"));
-        ASSERT_TRUE(!db::exists("no_exist.db"));
-        db::connection con = db::connect("no_exist.db");
-        FAIL() << "expected std::exception";
-    }
-    catch (const std::exception& e)
-    {
-        dprint(std::cout << e.what() << '\n');
-        SUCCEED();
-    }
+    const char* filename = "no_exist.db";
+    staff::fileDelete(filename);
+    ASSERT_TRUE(!staff::fileExists(filename));
+    ASSERT_ANY_THROW(db::connect(filename));
 }
+TEST_COMPONENT(001)
+{
+    const char* filename = "no_exist.db";
+    staff::fileDelete(filename);
+    ASSERT_TRUE(!staff::fileExists(filename));
+    ASSERT_NO_THROW(db::connect(filename, db::eCREATE));
+    {
+        const auto conn = db::connect(filename);
+        #ifdef NDEBUG
+            ASSERT_ANY_THROW(staff::makeTableAge(conn, "age"));
+        #else
+            ASSERT_DEATH_DEBUG(staff::makeTableAge(conn, "age"));
+        #endif
+    }
+    ASSERT_TRUE(staff::fileDelete(filename));
+}
+
+
+
+#if 0
 
 TEST_COMPONENT(001)
 {
@@ -210,9 +185,9 @@ TEST_COMPONENT(007)
     ASSERT_TRUE(!db::exists("test-A.db"));
     ASSERT_TRUE(!db::exists("test-B.db"));
 }
-
+#endif
 
 
 //==============================================================================
 //==============================================================================
-#endif // ! TEST_CONSTRUCT
+#endif // ! TEST_CONNECT

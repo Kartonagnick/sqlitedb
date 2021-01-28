@@ -2,6 +2,7 @@
 // [2021y-01m-23d] Idrisov Denis R.
 
 #include <sqlitedb/connection.hpp>
+#include "exception.hpp"
 #include "device.hpp"
 #include <cassert>
 
@@ -70,14 +71,26 @@ namespace db
 //==============================================================================
 namespace db
 {
-    void connection::dropTable(const str_t& table) const
+    bool connection::dropTable(const str_t& table) const
     {
-        const str_t sql = "DROP TABLE IF EXISTS " + table;
-        *this << sql;
+        //const str_t sql = "DROP TABLE IF EXISTS " + table;
+        const str_t sql = "DROP TABLE " + table;
+        try
+        {
+            *this << sql;
+            return true;
+        }
+        catch (const db::exception& e)
+        {
+            const auto code = e.code();
+            if (code == db::exception::eTABLE_DOES_NOT_EXIST)
+                return false;
+            throw;
+        }
     }
 
 
-    void connection::dropColumn(const str_t& table, const str_t& column) const
+    bool connection::dropColumn(const str_t& table, const str_t& column) const
     {
         (void) table;
         (void) column;

@@ -3,14 +3,17 @@
 
 #include <sqlitedb/request.hpp>
 #include "numeric_cast.hpp"
+#include "exception.hpp"
 #include <sqlite3.h>
 #include "device.hpp"
 #include <stdexcept>
 #include <cassert>
 #include <cstring>
 
+#include <iostream>
+
 //==============================================================================
-//===[integer] ====================================================================
+//=== [integer] ================================================================
 namespace db
 {
     using sizeT = ::std::atomic_size_t;
@@ -24,7 +27,7 @@ namespace db
 } // namespace db
 
 //==============================================================================
-//===[sqlite3] =================================================================
+//=== [sqlite3] ================================================================
 namespace db
 {
     // bind
@@ -90,34 +93,60 @@ namespace db
         , m_index(1)
     {}
 
-    request::~request()
+    request::~request() noexcept(false)
     {
         this->endQuery();
+        #if 0
+        try
+        {
+            
+        }
+        catch (...)
+        {
+            assert(false && "exception in '~request()'");
+        }
+        #endif
     }
+
 
     bool request::next() 
     { 
         assert(this->m_cursor);
-        const auto result = ::sqlite3_step(this->m_cursor);
-        assert(result == SQLITE_ROW || result == SQLITE_DONE);
-        if (result != SQLITE_ROW && result != SQLITE_DONE)
-            throw std::runtime_error("[db::next] sqlite3_step: failed");
-        return result == SQLITE_ROW;
+        const auto code = ::sqlite3_step(this->m_cursor);
+        assert(code == SQLITE_ROW || code == SQLITE_DONE);
+        if (code != SQLITE_ROW && code != SQLITE_DONE)
+        {
+            //std::cout << "(db::exception): [db::next] sqlite3_step: failed\n";
+            throw db::exception(code, "[db::next] sqlite3_step: failed");
+        }
+        return code == SQLITE_ROW;
     }
 
-    void request::endQuery() noexcept 
+    void request::endQuery()  
     { 
         if(!this->m_cursor)
         {
             assert(this->m_index  == 0);
             return;
         }
-        this->next();
+
+        std::exception_ptr eptr;
+        try
+        {
+            this->next();
+        }
+        catch (...)
+        {
+            eptr = std::current_exception();
+        }
         const auto ret = ::sqlite3_finalize(this->m_cursor);
         assert(ret == SQLITE_OK);
 		(void) ret;
         this->m_cursor = nullptr;
         this->m_index  = 0;
+
+        if (eptr)
+            std::rethrow_exception(eptr);
     }
 
     void request::bind(const void* value, const size_t size) noexcept

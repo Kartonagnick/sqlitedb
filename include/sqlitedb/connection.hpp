@@ -70,10 +70,10 @@ namespace db
         // table must be exist
         bool existColumn(const char* table, const char* column) const;
 
-        void dropTable(const str_t& name) const;
+        bool dropTable(const str_t& name) const;
 
         // table must be exist
-        void dropColumn(const str_t& table, const str_t& column) const;
+        bool dropColumn(const str_t& table, const str_t& column) const;
     public:
         template<class s>
         bool existTable(const s& name) const
