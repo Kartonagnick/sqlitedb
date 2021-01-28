@@ -55,21 +55,38 @@
 
 ## connect
   - [ ] [db::connect][7]
-    - [ ] eREADWRITE
-    - [ ] eREADONLY
+    - [x] eREADWRITE
+    - [x] eREADONLY
     - [ ] eOPEN_URI
-    - [ ] eCREATE
-  - [ ] [db::connection][8]
-    - [ ] Создание  
-    - [ ] Копирование  
-    - [ ] Перемещение  
-    - [ ] Присвоение  
+    - [x] eCREATE
+  - [x] [db::connection][8]
+    - [x] Создание  
+    - [x] Копирование  
+    - [x] Перемещение  
+    - [x] Присвоение  
 
 <br />
 <br />
 
 [7]: ../arch/002-connect.md/#connect
 [8]: ../arch/003-connection.md/#Конструкторы
+
+
+
+
+## table/column
+  - [x] [db::connect::existTable][9]
+  - [x] [db::connect::existColumn][10]
+  - [x] [db::connect::dropTable][11]
+  - [ ] [db::connect::dropColumn][12]
+
+<br />
+<br />
+
+[9]:  ../arch/003-connection.md/#existTable
+[10]: ../arch/003-connection.md/#existColumn
+[11]: ../arch/003-connection.md/#dropTable
+[12]: ../arch/003-connection.md/#dropColumn
 
 
 

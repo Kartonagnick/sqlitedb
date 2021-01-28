@@ -71,6 +71,7 @@ namespace db
         bool existColumn(const char* table, const char* column) const;
 
         bool dropTable(const str_t& name) const;
+        bool dropTable(const char* name) const;
 
         // table must be exist
         bool dropColumn(const str_t& table, const str_t& column) const;
@@ -110,6 +111,12 @@ namespace db
         //   the handler returns 0 which causes sqlite3_step() 
         //   to return SQLITE_BUSY.
 
+        const size_t timeout = 150 // milliseconds
+    );
+
+    connection connect(
+        const char* path, 
+        const eOPENMODE mode = eREADONLY,
         const size_t timeout = 150 // milliseconds
     );
 

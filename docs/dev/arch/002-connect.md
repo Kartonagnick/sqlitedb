@@ -45,13 +45,21 @@ connect
         const eOPENMODE mode = eREADONLY,
         const size_t timeout = 150 // milliseconds
     );
+
+    connection connect(
+        const char* path, 
+        const eOPENMODE mode = eREADONLY,
+        const size_t timeout = 150 // milliseconds
+    );
+
 ```
 
 - `path` путь к базе данных.  
 - `mode` задаёт [режим][0] открытия соединения.  
 - `timeout` количество миллисекунд, которое мы готовы [ждать][1], пока бд освободится.  
-  - [ ] При успешном соединении возвращает объект [connection][2]
-  - [ ] assert(path.empty());  
+  - [x] При успешном соединении возвращает объект [connection][2]
+  - [x] assert(path.empty());  
+  - [x] assert(path);  
 
 <br />
 <br />

@@ -6,9 +6,9 @@ connection
 
 - [ ] [Требования][0]  
 - [x] Члены класса:  
-  - [ ] [Деструктор][1]  
-  - [ ] [Конструкторы][2]  
-  - [ ] [operator=(connection)][3]  
+  - [x] [Деструктор][1]  
+  - [x] [Конструкторы][2]  
+  - [x] [operator=(connection)][3]  
   - [ ] [operator<<(sql)][4]  
   - [ ] [existTable(name)][5]  
   - [ ] [existColumn(table, column)][6]  
@@ -57,9 +57,9 @@ connection
 ~connection();
 ```
 
-- [ ] Защищён при помощи assert.  
-- [ ] Гарантирует noexcept (no-throw guarantee).  
-- [ ] Закрывает соединение.  
+- [x] Защищён при помощи assert.  
+- [x] Никогда не кидают исключений (no-throw guarantee).  
+- [x] Закрывает соединение.  
 
 
 
@@ -78,10 +78,10 @@ public:
 
 - [x] Конструктор создания запрещен.  
   - [x] Для создания объекта используйте [db::connect](002-connect.md/#connect)  
-- [ ] Конструкторы копирования оптимизированы:  
-  - [ ] Никогда не кидают исключений (no-throw guarantee).  
-  - [ ] Под капотом используется std::shared_ptr.  
-  - [ ] Быстрые.  
+- [x] Конструкторы копирования оптимизированы:  
+  - [x] Никогда не кидают исключений (no-throw guarantee).  
+  - [x] Под капотом используется std::shared_ptr.  
+  - [x] Быстрые.  
 
 <br />
 <br />
@@ -99,10 +99,10 @@ public:
     connection& operator=(connection&&)      noexcept;
 ```
 
-- [ ] Операторы присвоения оптимизированы:  
-  - [ ] Никогда не кидают исключений (no-throw guarantee).  
-  - [ ] Под капотом используется std::shared_ptr.  
-  - [ ] Быстрые.  
+- [x] Операторы присвоения оптимизированы:  
+  - [x] Никогда не кидают исключений (no-throw guarantee).  
+  - [x] Под капотом используется std::shared_ptr.  
+  - [x] Быстрые.  
 
 <br />
 <br />
@@ -144,8 +144,9 @@ existTable
 ```
 
 - [ ] Thread-Safe.  
-- [x] Может бросить исключение.  
-- [ ] assert(name);  
+- [x] Может бросить исключение. (например: std::bad_alloc)  
+- [x] assert(!name.empty());  
+- [x] assert(name);  
 
 <br />
 <br />
@@ -165,10 +166,12 @@ existColumn
 ```
 
 - [ ] Thread-Safe.  
-- [ ] Если таблицы не существует -> бросает исключение.  
+- [x] Если таблицы не существует -> бросает исключение.  
 - [x] Может бросить исключение.  
-- [ ] assert(table);  
-- [ ] assert(column);  
+- [x] assert(!table.empty());  
+- [x] assert(!column.empty());  
+- [x] assert(table);  
+- [x] assert(column);  
 
 <br />
 <br />
@@ -182,13 +185,16 @@ dropTable
 Удаляет таблицу.  
 
 ```cpp
-    void dropTable(const str_t& name) const;
+    bool dropTable(const str_t& name) const;
+    bool dropTable(const char* name) const;
 ```
 
 - [ ] Thread-Safe.  
-- [ ] Если таблицы не существует -> ничего не делает.  
-- [x] Может бросить исключение.  
-- [ ] assert(!name.empty());  
+- [x] Если таблица была успешно удалена -> возвращает true.  
+- [x] Если таблицы не существует -> возвращает false.
+- [x] Может бросить исключение. (например: std::bad_alloc)  
+- [x] assert(!name.empty());  
+- [x] assert(name.empty);  
 
 <br />
 <br />

@@ -11,23 +11,48 @@
 
 #include <sqlitedb/connection.hpp>
 #include "test-staff.hpp"
+using str_t  = ::std::string;
 namespace staff = staff_sqlitedb;
 namespace me = db;
 //==============================================================================
 //==============================================================================
 
-// --- db::eREADONLY
+// --- db::eCREATE
 TEST_COMPONENT(000)
 {
+    // must be not exist
+    // read : allowed
+    // write: allowed
+
+    const char* filename = "000-sample.db";
+    staff::dbaseDelete(filename);
+    ASSERT_TRUE(!staff::fileExists(filename));
+    {
+        const auto connect = db::connect(filename, db::eCREATE);
+        ASSERT_NO_THROW(staff::makeTableAge(connect, "age"));
+        ASSERT_NO_THROW(staff::addToAgeTable(connect, 1, 2));
+    }
+    ASSERT_TRUE(staff::dbaseDelete(filename));
+}
+
+// --- db::eREADONLY
+TEST_COMPONENT(001)
+{
+    // must be exist
+
     const char* filename = "no_exist.db";
     staff::fileDelete(filename);
     ASSERT_TRUE(!staff::fileExists(filename));
     ASSERT_ANY_THROW(db::connect(filename));
 }
-TEST_COMPONENT(001)
+
+TEST_COMPONENT(002)
 {
-    const char* filename = "no_exist.db";
-    staff::fileDelete(filename);
+    // read : allowed
+    // write: not allowed
+
+    const char* filename = "000-sample.db";
+    staff::dbaseDelete(filename);
     ASSERT_TRUE(!staff::fileExists(filename));
     ASSERT_NO_THROW(db::connect(filename, db::eCREATE));
     {
@@ -38,155 +63,138 @@ TEST_COMPONENT(001)
             ASSERT_DEATH_DEBUG(staff::makeTableAge(conn, "age"));
         #endif
     }
-    ASSERT_TRUE(staff::fileDelete(filename));
+    ASSERT_TRUE(staff::dbaseDelete(filename));
 }
 
-
-
-#if 0
-
-TEST_COMPONENT(001)
-{
-    try
-    {
-        // --- db::eREADWRITE
-        ASSERT_TRUE(!fileExists("no_exist.db"));
-        ASSERT_TRUE(!db::exists("no_exist.db"));
-        db::connection con 
-            = db::connect("no_exist.db", db::eREADWRITE);
-        FAIL() << "expected std::exception";
-    }
-    catch (const std::exception& e)
-    {
-        dprint(std::cout << e.what() << '\n');
-        SUCCEED();
-    }
-}
-
-TEST_COMPONENT(002)
-{
-    // --- db::eCREATE
-    fileDelete("test.db");
-    ASSERT_TRUE(!fileExists("test.db"));
-    ASSERT_TRUE(!db::exists("test.db"));
-    {
-        db::connection con = db::connect("test.db", db::eCREATE);
-    }
-    ASSERT_TRUE(db::exists("test.db"));
-    ASSERT_TRUE(fileExists("test.db"));
-    ASSERT_TRUE(fileDelete("test.db"));
-    ASSERT_TRUE(!fileExists("test.db"));
-    ASSERT_TRUE(!db::exists("test.db"));
-}
-
+// --- db::eREADWRITE
 TEST_COMPONENT(003)
 {
-    // --- db::eCREATE
-    fileDelete("test.db");
-    ASSERT_TRUE(!fileExists("test.db"));
-    ASSERT_TRUE(!db::exists("test.db"));
-    {
-        db::connection con = db::connect("test.db", db::eCREATE);
-    }
-    ASSERT_TRUE(db::exists("test.db"));
-    ASSERT_TRUE(fileExists("test.db"));
-    ASSERT_TRUE(db::remove("test.db"));
-    ASSERT_TRUE(!fileExists("test.db"));
-    ASSERT_TRUE(!db::exists("test.db"));
-}
+    // must be exist
 
+    const char* filename = "no_exist.db";
+    staff::dbaseDelete(filename);
+    ASSERT_TRUE(!staff::fileExists(filename));
+    ASSERT_ANY_THROW(db::connect(filename, db::eREADWRITE));
+}
 
 TEST_COMPONENT(004)
 {
-    // --- copy
+    // read : allowed
+    // write: allowed
 
-    fileDelete("test.db");
-    ASSERT_TRUE(!fileExists("test.db"));
-    ASSERT_TRUE(!db::exists("test.db"));
+    const char* filename = "000-sample.db";
+    staff::dbaseDelete(filename);
+    ASSERT_TRUE(!staff::fileExists(filename));
+    ASSERT_NO_THROW(db::connect(filename, db::eCREATE));
     {
-        db::connection con1 = db::connect("test.db", db::eCREATE);
-        db::connection con2 = con1;
+        const auto conn = db::connect(filename, db::eREADWRITE);
+        ASSERT_NO_THROW(staff::makeTableAge(conn, "age"));
+        ASSERT_NO_THROW(staff::addToAgeTable(conn, 1,1));
+        ASSERT_NO_THROW(staff::addToAgeTable(conn, 2,2));
+        ASSERT_NO_THROW(staff::addToAgeTable(conn, 3,3));
     }
-    ASSERT_TRUE(db::exists("test.db"));
-    ASSERT_TRUE(fileExists("test.db"));
-    ASSERT_TRUE(db::remove("test.db"));
-    ASSERT_TRUE(!fileExists("test.db"));
-    ASSERT_TRUE(!db::exists("test.db"));
+    ASSERT_TRUE(staff::dbaseDelete(filename));
 }
+
 
 TEST_COMPONENT(005)
 {
-    // --- move
+    // --- copy
 
-    fileDelete("test.db");
-    ASSERT_TRUE(!fileExists("test.db"));
-    ASSERT_TRUE(!db::exists("test.db"));
+    const char* filename = "000-sample.db";
+    staff::dbaseDelete(filename);
+    ASSERT_TRUE(!staff::fileExists(filename));
     {
-        db::connection con1 = db::connect("test.db", db::eCREATE);
-        db::connection con2 = std::move(con1);
+        db::connection con1 = db::connect(filename, db::eCREATE);
+        db::connection con2 = con1;
     }
-    ASSERT_TRUE(db::exists("test.db"));
-    ASSERT_TRUE(fileExists("test.db"));
-    ASSERT_TRUE(db::remove("test.db"));
-    ASSERT_TRUE(!fileExists("test.db"));
-    ASSERT_TRUE(!db::exists("test.db"));
+    ASSERT_TRUE(staff::fileExists(filename));
+    ASSERT_TRUE(staff::dbaseDelete(filename));
 }
 
 TEST_COMPONENT(006)
 {
-    // --- operator=
+    // --- move
 
-    fileDelete("test-A.db");
-    fileDelete("test-B.db");
-    ASSERT_TRUE(!fileExists("test-A.db"));
-    ASSERT_TRUE(!fileExists("test-B.db"));
-    ASSERT_TRUE(!db::exists("test-A.db"));
-    ASSERT_TRUE(!db::exists("test-B.db"));
+    const char* filename = "000-sample.db";
+    staff::dbaseDelete(filename);
+    ASSERT_TRUE(!staff::fileExists(filename));
     {
-        db::connection con1 = db::connect("test-A.db", db::eCREATE);
-        db::connection con2 = db::connect("test-B.db", db::eCREATE);
-        con2 = con1;
+        db::connection con1 = db::connect(filename, db::eCREATE);
+        db::connection con2 = std::move(con1);
     }
-    ASSERT_TRUE(db::exists("test-A.db"));
-    ASSERT_TRUE(db::exists("test-B.db"));
-    ASSERT_TRUE(fileExists("test-A.db"));
-    ASSERT_TRUE(fileExists("test-B.db"));
-    ASSERT_TRUE(db::remove("test-A.db"));
-    ASSERT_TRUE(db::remove("test-B.db"));
-    ASSERT_TRUE(!fileExists("test-A.db"));
-    ASSERT_TRUE(!fileExists("test-B.db"));
-    ASSERT_TRUE(!db::exists("test-A.db"));
-    ASSERT_TRUE(!db::exists("test-B.db"));
+    ASSERT_TRUE(staff::fileExists(filename));
+    ASSERT_TRUE(staff::dbaseDelete(filename));
 }
 
 TEST_COMPONENT(007)
 {
     // --- operator=
 
-    fileDelete("test-A.db");
-    fileDelete("test-B.db");
-    ASSERT_TRUE(!fileExists("test-A.db"));
-    ASSERT_TRUE(!fileExists("test-B.db"));
-    ASSERT_TRUE(!db::exists("test-A.db"));
-    ASSERT_TRUE(!db::exists("test-B.db"));
+    const char* base1 = "000-sample.db";
+    const char* base2 = "001-sample.db";
+
+    staff::dbaseDelete(base1);
+    staff::dbaseDelete(base2);
+    ASSERT_TRUE(!staff::fileExists(base1));
+    ASSERT_TRUE(!staff::fileExists(base2));
     {
-        db::connection con1 = db::connect("test-A.db", db::eCREATE);
-        db::connection con2 = db::connect("test-B.db", db::eCREATE);
+        db::connection con1 = db::connect(base1, db::eCREATE);
+        db::connection con2 = db::connect(base2, db::eCREATE);
+        con2 = con1;
+    }
+    ASSERT_TRUE(staff::fileExists(base1));
+    ASSERT_TRUE(staff::fileExists(base2));
+    ASSERT_TRUE(staff::dbaseDelete(base1));
+    ASSERT_TRUE(staff::dbaseDelete(base2));
+}
+
+TEST_COMPONENT(008)
+{
+    // --- operator=(move)
+
+    const char* base1 = "000-sample.db";
+    const char* base2 = "001-sample.db";
+
+    staff::dbaseDelete(base1);
+    staff::dbaseDelete(base2);
+    ASSERT_TRUE(!staff::fileExists(base1));
+    ASSERT_TRUE(!staff::fileExists(base2));
+    {
+        db::connection con1 = db::connect(base1, db::eCREATE);
+        db::connection con2 = db::connect(base2, db::eCREATE);
         con2 = std::move(con1);
     }
-    ASSERT_TRUE(db::exists("test-A.db"));
-    ASSERT_TRUE(db::exists("test-B.db"));
-    ASSERT_TRUE(fileExists("test-A.db"));
-    ASSERT_TRUE(fileExists("test-B.db"));
-    ASSERT_TRUE(db::remove("test-A.db"));
-    ASSERT_TRUE(db::remove("test-B.db"));
-    ASSERT_TRUE(!fileExists("test-A.db"));
-    ASSERT_TRUE(!fileExists("test-B.db"));
-    ASSERT_TRUE(!db::exists("test-A.db"));
-    ASSERT_TRUE(!db::exists("test-B.db"));
+    ASSERT_TRUE(staff::fileExists(base1));
+    ASSERT_TRUE(staff::fileExists(base2));
+    ASSERT_TRUE(staff::dbaseDelete(base1));
+    ASSERT_TRUE(staff::dbaseDelete(base2));
 }
-#endif
 
+//==============================================================================
+//==============================================================================
+
+#ifndef NDEBUG
+
+TEST_COMPONENT(009)
+{
+    const char* filename = nullptr;
+    ASSERT_DEATH_DEBUG(me::connect(filename));
+}
+
+TEST_COMPONENT(010)
+{
+    const char* filename = "";
+    ASSERT_DEATH_DEBUG(me::connect(filename));
+}
+
+TEST_COMPONENT(011)
+{
+    const str_t filename = "";
+    ASSERT_DEATH_DEBUG(me::connect(filename));
+}
+
+#endif // !!NDEBUG
 
 //==============================================================================
 //==============================================================================

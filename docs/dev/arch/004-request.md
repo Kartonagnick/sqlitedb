@@ -88,7 +88,7 @@ operator-in
     template<class T>
     request& operator << (T&& value) noexcept;
 ```
-
+- [x] защищается assert  
 - [x] принимает const char*  
 - [x] принимает const str_t  
 - [x] принимает float или double.  

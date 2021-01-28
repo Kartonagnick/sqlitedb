@@ -146,12 +146,17 @@ R"RAW((
          makeTableAge(conn, table);
     }
 
+    void addToAgeTable(const db::connection& base, const int login, const size_t age)
+    {
+        const str_t sql = "insert into age (login, age) values (?,?)";
+        base << sql << login << age;
+    }
+
     void addToAgeTable(const str_t& path, const int login, const size_t age)
     {
         assert(!path.empty());
-        const str_t sql = "insert into age (login, age) values (?,?)";
-        db::connection con = db::connect(path, db::eREADWRITE);
-        con << sql << login << age;
+        const auto con = db::connect(path, db::eREADWRITE);
+        addToAgeTable(con, login, age);
     }
 
 } // namespace staff_sqlitedb

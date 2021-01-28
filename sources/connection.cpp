@@ -89,6 +89,13 @@ namespace db
         }
     }
 
+    bool connection::dropTable(const char* name) const
+    {
+        assert(name);
+        assert(*name != 0);
+        return this->dropTable(str_t(name));
+    }
+
 
     bool connection::dropColumn(const str_t& table, const str_t& column) const
     {
@@ -107,9 +114,10 @@ namespace db
     bool connection::existTable(const char* name) const
     {
         assert(name);
+        assert(*name != 0);
+
         const char* sql 
-            = "SELECT count(*) FROM sqlite_master "
-              "WHERE type='table' AND name=?";
+            = "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?";
 
         size_t count = 0;
         const auto lambda = [&count](const size_t v) noexcept
@@ -127,20 +135,64 @@ namespace db
     {
         assert(table);
         assert(column);
-        const char* sql
-            = "SELECT COUNT(*) AS CNTREC FROM pragma_table_info(?) WHERE name=?";
 
-        size_t count = 0;
-        const auto lambda = [&count](const size_t v) noexcept
-        {
-            count = v; 
-            return true;
-        };
+        #if 0
+            // if exist column  -> true
+            // if !exist column -> false
+            // if !exist table  -> false
+            const char* sql = "SELECT COUNT(*) FROM pragma_table_info(?) WHERE name=?";
+        #endif
+
+        #if 0
+            | info_table | info_column |   description    |
+            |      1     |     1       | column exist     |
+            |      1     |     0       | column not exist |
+            |      0     |     0       | table not exist  |
+        #endif
+
+        const char* sql= R"raw(
+            SELECT
+                info_table.count as info_table, info_column.count as info_column
+            FROM
+                (SELECT count() as count FROM sqlite_master WHERE type='table' AND name=:A) 
+                    info_table,
+                (SELECT count() as count from pragma_table_info(:A) where name =:B) 
+                    info_column
+        )raw";
+        
+        bool exist_table  = false;
+        bool exist_column = false;
+
+        #ifndef NDEBUG
+            size_t count = 0;
+            const auto lambda = [&count, &exist_table, &exist_column]
+            (const bool table, const bool column) noexcept
+            {
+                ++count;
+                exist_table  = table; 
+                exist_column = column;
+                return true;
+            };
+        #else
+            const auto lambda = [&exist_table, &exist_column]
+            (const bool table, const bool column) noexcept
+            {
+                exist_table  = table; 
+                exist_column = column;
+                return true;
+            };
+        #endif
 
         *this << sql << table << column
             >> lambda;
+
         assert(count == 0 || count == 1);
-        return count != 0;
+
+        if (!exist_table)
+            throw std::runtime_error(
+                "[connection::existColumn] table: '" + str_t(table) + "' not exist"
+            );
+        return exist_column;
     }
 
 } // namespace db
@@ -149,14 +201,21 @@ namespace db
 //==============================================================================
 namespace db
 {
-    connection connect(const str_t& path, const eOPENMODE mode, 
-        const size_t timeout)
+    connection connect(const str_t& path, const eOPENMODE mode, const size_t timeout)
     {
+        assert(!path.empty());
         auto shared = ::std::make_shared<db::device>(path, mode, timeout);
         assert(shared);
         connection result;
         result.m_data = std::move(shared);
         return result;
+    }
+
+    connection connect(const char* path, const eOPENMODE mode, const size_t timeout)
+    {
+        assert(path);
+        assert(*path != 0);
+        return db::connect(str_t(path), mode, timeout);
     }
 
 } // namespace db

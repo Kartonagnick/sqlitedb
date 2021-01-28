@@ -38,14 +38,14 @@ namespace db
        ~request() noexcept(false);
     public:
         template<class T>
-        request& operator << (T&& value) noexcept 
+        request&& operator << (T&& value) && noexcept
         { 
             this->bind(::std::forward<T>(value));
-            return *this;
+            return std::move(*this);
         }
 
         template<class T>
-        void operator >> (T&& dst);
+        void operator >> (T&& dst) &&;
 
     private:
         template<class T> auto getValue(const size_t index)
@@ -133,7 +133,7 @@ namespace db
 namespace db
 {
     template<class T>
-    void request::operator >> (T&& dst)
+    void request::operator >> (T&& dst) &&
     { 
         cursor::template get<T>(
             *this, std::forward<T>(dst)
