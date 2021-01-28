@@ -121,9 +121,11 @@ operator<< (sql)
     request operator << (const char*  sql) const;
 ```
 
-- [ ] Thread-Safe.  
-- [x] Может бросить исключение.  
-- [ ] Возвращает объект [db::request](004-request.md/#request)  
+- [x] Возвращает объект [db::request](004-request.md/#request)  
+- [x] Если запрос некорректный -> бросает исключение.  
+- [x] Может бросить исключение. (например: std::bad_alloc)  
+- [x] assert(!sql.empty())  
+- [x] assert(sql)  
 
 <br />
 <br />
@@ -143,7 +145,6 @@ existTable
     bool existTable(const s& name) const;
 ```
 
-- [ ] Thread-Safe.  
 - [x] Может бросить исключение. (например: std::bad_alloc)  
 - [x] assert(!name.empty());  
 - [x] assert(name);  
@@ -165,7 +166,6 @@ existColumn
     bool existColumn(const s1& table, const s2& column) const;
 ```
 
-- [ ] Thread-Safe.  
 - [x] Если таблицы не существует -> бросает исключение.  
 - [x] Может бросить исключение.  
 - [x] assert(!table.empty());  
@@ -189,7 +189,6 @@ dropTable
     bool dropTable(const char* name) const;
 ```
 
-- [ ] Thread-Safe.  
 - [x] Если таблица была успешно удалена -> возвращает true.  
 - [x] Если таблицы не существует -> возвращает false.
 - [x] Может бросить исключение. (например: std::bad_alloc)  
@@ -211,7 +210,6 @@ dropColumn
     void dropColumn(const str_t& table, const str_& column) const;
 ```
 
-- [ ] Thread-Safe.  
 - [ ] Если таблицы не существует -> бросает исключение.  
 - [x] Может бросить исключение.  
 - [ ] assert(!table.empty());  
@@ -219,5 +217,3 @@ dropColumn
 
 <br />
 <br />
-
-

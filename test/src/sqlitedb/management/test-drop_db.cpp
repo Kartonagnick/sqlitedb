@@ -15,7 +15,7 @@
 namespace staff = staff_sqlitedb;
 
 using str_t = ::std::string;
-namespace me = db;
+
 //==============================================================================
 //==============================================================================
 
@@ -83,17 +83,17 @@ TEST_COMPONENT(002)
 TEST_COMPONENT(003)
 {
     const char* filename = nullptr;
-    ASSERT_DEATH_DEBUG(me::existDatabase(filename));
+    ASSERT_DEATH_DEBUG(db::existDatabase(filename));
 }
 TEST_COMPONENT(004)
 {
     const char* filename = "";
-    ASSERT_DEATH_DEBUG(me::existDatabase(filename));
+    ASSERT_DEATH_DEBUG(db::existDatabase(filename));
 }
 TEST_COMPONENT(005)
 {
     const str_t filename = "";
-    ASSERT_DEATH_DEBUG(me::existDatabase(filename));
+    ASSERT_DEATH_DEBUG(db::existDatabase(filename));
 }
 #endif // !!NDEBUG
 

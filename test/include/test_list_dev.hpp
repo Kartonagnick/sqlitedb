@@ -34,17 +34,17 @@
     // #define TEST_EXISTS_COLUMN                           // ready!
     // #define TEST_DROP_DATABASE                           // ready!
     // #define TEST_DROP_TABLE                              // ready!
-
 //==============================================================================
 //===== sqlitedb/connect ===================================||==================
     // #define TEST_CONNECT                                 // ready!
 //==============================================================================
-//===== sqlitedb/table and columns =========================||==================
-    // #define TEST_TABLE                                   // ready!
-    // #define TEST_COLUMN                                  // ready!
+//===== sqlitedb/connection ================================||==================
+    #define TEST_TABLE                                      // ready!
+    #define TEST_COLUMN                                     // ready!
+    #define TEST_OPERATOR_SQL                               // ready!
 //==============================================================================
-//===== sqlitedb/SQL queries ===============================||==================
-    // #define TEST_CONTENT                                 // in progress...
+//===== sqlitedb/request ===================================||==================
+    // #define TEST_TYPE_SAFE                               // in progress...
 //==========================================================||==================
 //==============================================================================
 

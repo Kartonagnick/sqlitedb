@@ -1,16 +1,16 @@
 
 #include <mygtest/modern.hpp>
-#include <sqlitedb/sqlitedb.hpp>
 //==============================================================================
 //==============================================================================
 
-#ifdef TEST_CONTENT
+#ifdef TEST_TYPE_SAFE
 
-#define dTEST_COMPONENT db, connection
-#define dTEST_METHOD content
+#define dTEST_COMPONENT db, request
+#define dTEST_METHOD type_safe
 #define dTEST_TAG tdd
 
-namespace me = db;
+#include <sqlitedb/sqlitedb.hpp>
+
 //==============================================================================
 //==============================================================================
 
@@ -54,6 +54,8 @@ using namespace test_content;
 
 TEST_COMPONENT(000)
 {
+
+#if 0
     db::remove("samples.db");
     ASSERT_TRUE(!db::exists("samples.db"));
     {
@@ -92,8 +94,10 @@ TEST_COMPONENT(000)
     }
     ASSERT_TRUE(db::remove("samples.db"));
     ASSERT_TRUE(!db::exists("samples.db"));
+#endif
+
 }
 
 //==============================================================================
 //==============================================================================
-#endif // ! TEST_CONTENT
+#endif // ! TEST_TYPE_SAFE

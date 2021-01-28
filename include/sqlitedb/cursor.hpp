@@ -88,25 +88,26 @@ namespace db
         friend class request;
 
         template<class Request, class T>
-        static dFOR_SQLITEDB(other) get(Request& owner, T&& dst)
+        static dFOR_SQLITEDB(other) get(Request& owner, T& dst)
         { 
             using y = ::std::remove_reference_t<T>;
             using x = ::std::remove_cv_t<y>;
             const auto yes = owner.next();
-            assert(yes);
+            assert(yes); 
+            (void)yes;
             dst = owner.template getValue<x>(0);
             assert(!owner.next());
         }
 
         template<class T>
-        static dFOR_SQLITEDB(lambda) get(request& owner, T&& dst)
+        static dFOR_SQLITEDB(lambda) get(request& owner, T& dst)
         { 
             const auto count = cursor::template loop(owner, dst);
             (void) count;
         }
 
         template<class T>
-        static dFOR_SQLITEDB(tuple) get(request& owner, T&& dst)
+        static dFOR_SQLITEDB(tuple) get(request& owner, T& dst)
         { 
             using agent = detail::get_lambda<T>;
             const auto& lambda = agent::make(dst);

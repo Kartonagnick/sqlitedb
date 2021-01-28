@@ -14,9 +14,8 @@
 
 #include "test-staff.hpp"
 namespace staff = staff_sqlitedb;
-
 using str_t = ::std::string;
-namespace me = db;
+
 //==============================================================================
 //==============================================================================
 
@@ -75,37 +74,37 @@ TEST_COMPONENT(004)
 {
     const char* filename = nullptr;
     const char* table    = "11";
-    ASSERT_DEATH_DEBUG(me::existTable(filename, table));
+    ASSERT_DEATH_DEBUG(db::existTable(filename, table));
 }
 TEST_COMPONENT(005)
 {
     const char* filename = "";
     const char* table    = "11";
-    ASSERT_DEATH_DEBUG(me::existTable(filename, table));
+    ASSERT_DEATH_DEBUG(db::existTable(filename, table));
 }
 TEST_COMPONENT(006)
 {
     const str_t filename = "";
     const char* table    = "11";
-    ASSERT_DEATH_DEBUG(me::existTable(filename, table));
+    ASSERT_DEATH_DEBUG(db::existTable(filename, table));
 }
 TEST_COMPONENT(007)
 {
     const char* filename = "11";
     const char* table    = nullptr;
-    ASSERT_DEATH_DEBUG(me::existTable(filename, table));
+    ASSERT_DEATH_DEBUG(db::existTable(filename, table));
 }
 TEST_COMPONENT(008)
 {
     const char* filename = "11";
     const char* table    = "";
-    ASSERT_DEATH_DEBUG(me::existTable(filename, table));
+    ASSERT_DEATH_DEBUG(db::existTable(filename, table));
 }
 TEST_COMPONENT(009)
 {
     const str_t filename = "11";
     const str_t table    = "";
-    ASSERT_DEATH_DEBUG(me::existTable(filename, table));
+    ASSERT_DEATH_DEBUG(db::existTable(filename, table));
 }
 #endif // !!NDEBUG
 

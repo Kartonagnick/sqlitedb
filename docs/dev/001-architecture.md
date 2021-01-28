@@ -3,7 +3,7 @@
 - [x] Описание версии биллиотеки [confbuild.hpp][0]
 - [x] Весь код библиотеки расположен в пространстве имен `db`  
 - [x] Вся библиотека состоит:  
-  - [ ] Нескольких функций управления (management.hpp):  
+  - [x] Нескольких функций управления (management.hpp):  
     - [x] [db::availableDatabase(filename)][1]  
     - [x] [db::existDatabase(filename)][2]  
     - [x] [db::existTable(filename, table)][3]  
@@ -12,9 +12,9 @@
     - [x] [db::dropTable(filename, table)][6]  
     - [ ] [db::dropColumn(filename, table, column)][7]  
   - [x] Функция создания соединения:  
-    - [ ] [db::connect(filename, params...)][8]  
+    - [x] [db::connect(filename, params...)][8]  
   - [x] публичные классы:  
-    - [ ] [db::connection][9]  
+    - [x] [db::connection][9]  
   - [x] служебно-публичные классы:  
     - [ ] [db::request][10]  
     - [ ] [db::cursor][11]  

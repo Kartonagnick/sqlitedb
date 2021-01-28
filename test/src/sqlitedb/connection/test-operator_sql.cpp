@@ -4,10 +4,10 @@
 //==============================================================================
 //==============================================================================
 
-#ifdef TEST_COLUMN
+#ifdef TEST_OPERATOR_SQL
 
 #define dTEST_COMPONENT db, connection
-#define dTEST_METHOD column
+#define dTEST_METHOD operator_sql
 #define dTEST_TAG tdd
 
 //==============================================================================
@@ -29,87 +29,64 @@ namespace
 //==============================================================================
 //==============================================================================
 
-// --- existColumn
 TEST_COMPONENT(000)
 {
+    // --- simple sql-request
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
     {
-        const auto con = db::connect(base);
-        ASSERT_TRUE( con.existTable("users"));
-        ASSERT_TRUE( con.existColumn("users", "login"   ));
-        ASSERT_TRUE( con.existColumn("users", "age"     ));
-        ASSERT_TRUE(!con.existColumn("users", "no_exist"));
+        size_t count = size_t(-1);
+        const auto con = db::connect(base, db::eCREATE);
+        ASSERT_NO_THROW(
+            con << "SELECT COUNT(*) FROM sqlite_master" >> count
+        );
+        ASSERT_TRUE(count == 0);
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 
 TEST_COMPONENT(001)
 {
+    // --- simple sql-request
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
     {
-        const auto con = db::connect(base);
-        ASSERT_TRUE( con.existTable("users"));
-
-        ASSERT_TRUE( con.existColumn("users", "login"   ));
-        ASSERT_TRUE( con.existColumn("users", "age"     ));
-        ASSERT_TRUE(!con.existColumn("users", "no_exist"));
-
-        ASSERT_TRUE(!con.existTable("no_exist"));
-        ASSERT_ANY_THROW(con.existColumn("no_exist", "login"));
+        const auto con = db::connect(base, db::eCREATE);
+        ASSERT_ANY_THROW(con << "123aadsa");
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 
-
-
 #ifndef NDEBUG
-
-template<class s> static inline 
-const char* ptr_(s&& p) noexcept { return p; }
-
-template<class s1, class s2>
-void deathColumn(s1&& table, s2&& column)
-{
-    const char* t = ptr_(table);
-    const char* c = ptr_(column);
-    const auto con = db::connect(base);
-    ASSERT_DEATH_DEBUG(con.existColumn(t, c));
-}
-#define dDEATH(table, column) deathColumn(table, column);
-
 TEST_COMPONENT(002)
 {
-    // --- prepare
+    // -- prepare
     ASSERT_NO_THROW(staff::dbaseDelete(base));
     ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
 }
-
 TEST_COMPONENT(003)
 {
-    // --- work
-    dDEATH(nullptr, nullptr);
-    dDEATH(nullptr, ""     );
-    dDEATH(nullptr, "11"   );
-
-    dDEATH(""     , nullptr);
-    dDEATH(""     , ""     );
-    dDEATH(""     , "11"   );
-
-    dDEATH("11"   , nullptr);
-    dDEATH("11"   , ""     );
+    const char* sql = nullptr;
+    const auto con = db::connect(base);
+    ASSERT_DEATH_DEBUG(con << sql);
 }
-
 TEST_COMPONENT(004)
+{
+    const char* sql = "";
+    const auto con = db::connect(base);
+    ASSERT_DEATH_DEBUG(con << sql);
+}
+TEST_COMPONENT(005)
+{
+    const str_t sql = "";
+    const auto con = db::connect(base);
+    ASSERT_DEATH_DEBUG(con << sql);
+}
+TEST_COMPONENT(006)
 {
     // --- clean
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
-
-
 #endif // !!NDEBUG
 
 //==============================================================================
 //==============================================================================
-#endif // ! TEST_COLUMN
+#endif // ! TEST_OPERATOR_SQL

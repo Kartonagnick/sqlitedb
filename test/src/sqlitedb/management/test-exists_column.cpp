@@ -16,7 +16,7 @@
 namespace staff = staff_sqlitedb;
 
 using str_t = ::std::string;
-namespace me = db;
+
 //==============================================================================
 //==============================================================================
 
@@ -90,7 +90,7 @@ void deathColumn(s1&& base, s2&& table, s3&& column)
     const char* b = ptr_(base);
     const char* t = ptr_(table);
     const char* c = ptr_(column);
-    ASSERT_DEATH_DEBUG(me::existColumn(b, t, c));
+    ASSERT_DEATH_DEBUG(db::existColumn(b, t, c));
 }
 #define dDEATH(base, table, column) deathColumn(base, table, column);
 

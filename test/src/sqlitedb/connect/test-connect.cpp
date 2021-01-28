@@ -13,7 +13,7 @@
 #include "test-staff.hpp"
 using str_t  = ::std::string;
 namespace staff = staff_sqlitedb;
-namespace me = db;
+
 //==============================================================================
 //==============================================================================
 
@@ -179,19 +179,19 @@ TEST_COMPONENT(008)
 TEST_COMPONENT(009)
 {
     const char* filename = nullptr;
-    ASSERT_DEATH_DEBUG(me::connect(filename));
+    ASSERT_DEATH_DEBUG(db::connect(filename));
 }
 
 TEST_COMPONENT(010)
 {
     const char* filename = "";
-    ASSERT_DEATH_DEBUG(me::connect(filename));
+    ASSERT_DEATH_DEBUG(db::connect(filename));
 }
 
 TEST_COMPONENT(011)
 {
     const str_t filename = "";
-    ASSERT_DEATH_DEBUG(me::connect(filename));
+    ASSERT_DEATH_DEBUG(db::connect(filename));
 }
 
 #endif // !!NDEBUG

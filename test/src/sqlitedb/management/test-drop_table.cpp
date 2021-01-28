@@ -15,7 +15,7 @@
 namespace staff = staff_sqlitedb;
 
 using str_t = ::std::string;
-namespace me = db;
+
 //==============================================================================
 //==============================================================================
 
@@ -64,7 +64,7 @@ void deathTable(s1&& base, s2&& table)
 {
     const char* b = ptr_(base);
     const char* t = ptr_(table);
-    ASSERT_DEATH_DEBUG(me::dropTable(b, t));
+    ASSERT_DEATH_DEBUG(db::dropTable(b, t));
 }
 #define dDEATH(base, table) deathTable(base, table);
 

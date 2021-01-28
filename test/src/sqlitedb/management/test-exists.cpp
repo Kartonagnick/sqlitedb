@@ -20,7 +20,7 @@ namespace db
     bool exists(const str_t& name) noexcept;
 
 } // namespace db
-namespace me = db;
+
 //==============================================================================
 //==============================================================================
 
@@ -30,17 +30,17 @@ TEST_COMPONENT(000)
 
     staff::fileDelete(filename);
     ASSERT_TRUE(!staff::fileExists(filename));
-    ASSERT_TRUE(!me::exists(filename));
+    ASSERT_TRUE(!db::exists(filename));
     {
         auto out = staff::openWrite(filename);
         out << "test-000\n";
     }
     ASSERT_TRUE(staff::fileExists(filename));
-    ASSERT_TRUE(me::exists(filename));
+    ASSERT_TRUE(db::exists(filename));
     
     ASSERT_TRUE( staff::fileDelete(filename));
     ASSERT_TRUE(!staff::fileExists(filename));
-    ASSERT_TRUE(!me::exists(filename));
+    ASSERT_TRUE(!db::exists(filename));
 }
 
 TEST_COMPONENT(001)
@@ -49,34 +49,34 @@ TEST_COMPONENT(001)
 
     staff::fileDelete(filename);
     ASSERT_TRUE(!staff::fileExists(filename));
-    ASSERT_TRUE(!me::exists(filename));
+    ASSERT_TRUE(!db::exists(filename));
     {
         auto out = staff::openWrite(filename);
         out << "test-000\n";
     }
     ASSERT_TRUE(staff::fileExists(filename));
-    ASSERT_TRUE(me::exists(filename));
+    ASSERT_TRUE(db::exists(filename));
     
     ASSERT_TRUE( staff::fileDelete(filename));
     ASSERT_TRUE(!staff::fileExists(filename));
-    ASSERT_TRUE(!me::exists(filename));
+    ASSERT_TRUE(!db::exists(filename));
 }
 
 #ifndef NDEBUG
 TEST_COMPONENT(002)
 {
     const char* filename = nullptr;
-    ASSERT_DEATH_DEBUG(me::exists(filename));
+    ASSERT_DEATH_DEBUG(db::exists(filename));
 }
 TEST_COMPONENT(003)
 {
     const char* filename = "";
-    ASSERT_DEATH_DEBUG(me::exists(filename));
+    ASSERT_DEATH_DEBUG(db::exists(filename));
 }
 TEST_COMPONENT(004)
 {
     const str_t filename = "";
-    ASSERT_DEATH_DEBUG(me::exists(filename));
+    ASSERT_DEATH_DEBUG(db::exists(filename));
 }
 #endif // !!NDEBUG
 
