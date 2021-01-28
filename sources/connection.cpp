@@ -135,6 +135,8 @@ namespace db
     {
         assert(table);
         assert(column);
+        assert(*table != 0);
+        assert(*column != 0);
 
         #if 0
             // if exist column  -> true
@@ -166,19 +168,19 @@ namespace db
         #ifndef NDEBUG
             size_t count = 0;
             const auto lambda = [&count, &exist_table, &exist_column]
-            (const bool table, const bool column) noexcept
+            (const bool table_value, const bool column_value) noexcept
             {
                 ++count;
-                exist_table  = table; 
-                exist_column = column;
+                exist_table  = table_value; 
+                exist_column = column_value;
                 return true;
             };
         #else
             const auto lambda = [&exist_table, &exist_column]
-            (const bool table, const bool column) noexcept
+            (const bool table_value, const bool column_value) noexcept
             {
-                exist_table  = table; 
-                exist_column = column;
+                exist_table  = table_value; 
+                exist_column = column_value;
                 return true;
             };
         #endif

@@ -114,6 +114,14 @@ TEST_COMPONENT(007)
     const auto con = db::connect(base, db::eREADWRITE);
     ASSERT_DEATH_DEBUG(con.dropTable(table));
 }
+
+TEST_COMPONENT(008)
+{
+    // --- clean
+    ASSERT_TRUE(staff::dbaseDelete(base));
+}
+
+
 #endif // !!NDEBUG
 
 //==============================================================================

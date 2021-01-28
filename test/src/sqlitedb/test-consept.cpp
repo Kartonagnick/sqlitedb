@@ -42,8 +42,14 @@ class request
         this->vec.emplace_back(1);
     }
 public:
+    request(request&& rhs) noexcept
+	    :vec(std::move(rhs.vec))
+        ,error(std::move(rhs.error))
+	{ rhs.error = false; }
+
     request(const request&)             = delete;
     request& operator =(const request&) = delete;
+    request& operator =(request&&)      = delete;	
 
     ~request() noexcept(false)  // can throw exception
     {
@@ -125,7 +131,8 @@ TEST_COMPONENT(001)
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        (void)e;
+        dprint(std::cerr << e.what() << '\n');
         SUCCEED();
     }
 }
@@ -140,7 +147,8 @@ TEST_COMPONENT(002)
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        (void)e;
+        dprint(std::cerr << e.what() << '\n');
         SUCCEED();
     }
 }
@@ -154,7 +162,8 @@ TEST_COMPONENT(003)
     }
     catch (const std::exception& e)
     {
-        std::cerr << e.what() << '\n';
+        (void)e;
+        dprint(std::cerr << e.what() << '\n');
         SUCCEED();
     }
 }

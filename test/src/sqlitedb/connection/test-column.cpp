@@ -75,15 +75,21 @@ void deathColumn(s1&& table, s2&& column)
 {
     const char* t = ptr_(table);
     const char* c = ptr_(column);
-    ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
-    const auto con = db::connect(base, db::eCREATE);
+    const auto con = db::connect(base);
     ASSERT_DEATH_DEBUG(con.existColumn(t, c));
 }
 #define dDEATH(table, column) deathColumn(table, column);
 
 TEST_COMPONENT(002)
 {
+    // --- prepare
+    ASSERT_NO_THROW(staff::dbaseDelete(base));
+    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+}
+
+TEST_COMPONENT(003)
+{
+    // --- work
     dDEATH(nullptr, nullptr);
     dDEATH(nullptr, ""     );
     dDEATH(nullptr, "11"   );
@@ -95,6 +101,13 @@ TEST_COMPONENT(002)
     dDEATH("11"   , nullptr);
     dDEATH("11"   , ""     );
 }
+
+TEST_COMPONENT(004)
+{
+    // --- clean
+    ASSERT_TRUE(staff::dbaseDelete(base));
+}
+
 
 #endif // !!NDEBUG
 

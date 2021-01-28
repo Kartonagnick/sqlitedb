@@ -16,32 +16,32 @@
 
 //==============================================================================
 //===== modern/classic =====================================||==================
-    #define TEST_MODERN                                     // ready!
-    #define TEST_CLASSIC                                    // ready!
+    // #define TEST_MODERN                                  // ready!
+    // #define TEST_CLASSIC                                 // ready!
 //==============================================================================
 //===== sqlitedb/staff =====================================||==================
-    #define TEST_STAFF                                      // ready!
+    // #define TEST_STAFF                                   // ready!
 //==============================================================================
 //===== sqlitedb/consept ===================================||==================
-    #define TEST_CONSEPT                                    // ready!
+    // #define TEST_CONSEPT                                 // ready!
 //==============================================================================
 //===== sqlitedb/management ================================||==================
-    #define TEST_EXISTS                                     // ready!
-    #define TEST_REMOVE                                     // ready!
-    #define TEST_EXISTS_DATABASE                            // ready!
-    #define TEST_AVAILABLE_DATABASE                         // ready!
-    #define TEST_EXISTS_TABLE                               // ready!
-    #define TEST_EXISTS_COLUMN                              // ready!
-    #define TEST_DROP_DATABASE                              // ready!
-    #define TEST_DROP_TABLE                                 // ready!
+    // #define TEST_EXISTS                                  // ready!
+    // #define TEST_REMOVE                                  // ready!
+    // #define TEST_EXISTS_DATABASE                         // ready!
+    // #define TEST_AVAILABLE_DATABASE                      // ready!
+    // #define TEST_EXISTS_TABLE                            // ready!
+    // #define TEST_EXISTS_COLUMN                           // ready!
+    // #define TEST_DROP_DATABASE                           // ready!
+    // #define TEST_DROP_TABLE                              // ready!
 
 //==============================================================================
 //===== sqlitedb/connect ===================================||==================
-    #define TEST_CONNECT                                    // ready!
+    // #define TEST_CONNECT                                 // ready!
 //==============================================================================
 //===== sqlitedb/table and columns =========================||==================
-    #define TEST_TABLE                                      // ready!
-    #define TEST_COLUMN                                     // ready!
+    // #define TEST_TABLE                                   // ready!
+    // #define TEST_COLUMN                                  // ready!
 //==============================================================================
 //===== sqlitedb/SQL queries ===============================||==================
     // #define TEST_CONTENT                                 // in progress...
