@@ -70,7 +70,7 @@ TEST_COMPONENT(002)
     ASSERT_TRUE(!staff::fileExists(shm ));
     ASSERT_TRUE(!staff::fileExists(wal ));
 
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
     ASSERT_TRUE(db::dropDatabase(base));
 
     ASSERT_TRUE(!staff::fileExists(base));

@@ -109,7 +109,7 @@ TEST_COMPONENT(003)
 
     ASSERT_NO_THROW(staff::dbaseDelete(base));
     ASSERT_TRUE(!staff::fileExists(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "age"));
+    ASSERT_NO_THROW(staff::makeTable(base, "age"));
     ASSERT_TRUE(staff::fileExists(base));
     ASSERT_TRUE(staff::dbaseDelete(base));
     ASSERT_TRUE(!staff::fileExists(base));
@@ -127,7 +127,7 @@ TEST_COMPONENT(004)
     ASSERT_TRUE(!staff::fileExists(shm));
     ASSERT_TRUE(!staff::fileExists(wal));
 
-    ASSERT_NO_THROW(staff::makeTableAge(base, "age"));
+    ASSERT_NO_THROW(staff::makeTable(base));
     staff::openWrite(shm) << "test-000\n";
     staff::openWrite(wal) << "test-000\n";
 

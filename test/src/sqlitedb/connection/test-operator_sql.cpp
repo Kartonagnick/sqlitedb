@@ -60,7 +60,7 @@ TEST_COMPONENT(002)
 {
     // -- prepare
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
 }
 TEST_COMPONENT(003)
 {

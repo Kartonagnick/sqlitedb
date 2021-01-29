@@ -68,7 +68,7 @@ TEST_COMPONENT(003)
     const char* column = "age";
 
     staff::dbaseDelete(base);
-    ASSERT_NO_THROW(staff::makeTableAge(base, table));
+    ASSERT_NO_THROW(staff::makeTable(base, table));
 
     ASSERT_TRUE(staff::fileExists(base));
     ASSERT_TRUE(db::existTable(base, table));

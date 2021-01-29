@@ -32,12 +32,41 @@ namespace staff_sqlitedb
     ::std::ifstream openRead(const str_t& path);
     ::std::ifstream openRead(const char*  path);
 
-    void makeTableAge(const str_t& base, const str_t& table);
+    void makeTable(
+        const str_t& base, 
+        const str_t& table = "users"
+    );
 
-    void makeTableAge(const db::connection& base, const str_t& table);
+    void makeTable(
+        const db::connection& base,
+        const str_t& table = "users"
+    );
 
-    void addToUsersTable(const str_t& path, const size_t login, const size_t age);
-    void addToUsersTable(const db::connection& base, const size_t login, const size_t age);
+    void addToTable(
+        const str_t& path, 
+        const size_t login,
+        const size_t age
+    );
+    void addToTable(
+        const str_t& path, 
+        const str_t& table, 
+        const size_t login,
+        const size_t age
+    );
+
+
+    void addToTable(
+        const db::connection& base, 
+        const size_t login, 
+        const size_t age
+    );
+    void addToTable(
+        const db::connection& base, 
+        const str_t& table, 
+        const size_t login, 
+        const size_t age
+    );
+
 
 } // namespace staff_sqlitedb
 

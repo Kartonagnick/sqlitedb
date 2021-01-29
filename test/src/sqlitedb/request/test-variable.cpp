@@ -3,24 +3,24 @@
 //==============================================================================
 //==============================================================================
 
-#ifdef TEST_TYPE_SAFE
+#ifdef TEST_VARIABLE
 
 #define dTEST_COMPONENT db, request
-#define dTEST_METHOD type_safe
+#define dTEST_METHOD variable
 #define dTEST_TAG tdd
 
 #include "test-staff.hpp"
 #include <sqlitedb/sqlitedb.hpp>
 
 namespace staff = staff_sqlitedb;
-namespace test_type_safe {}
-namespace test = test_type_safe;
+namespace test_variable {}
+namespace test = test_variable;
 using str_t = ::std::string;
 
 //==============================================================================
 //==============================================================================
 
-namespace test_type_safe
+namespace test_variable
 {
     void addData(const db::connection& con, const str_t& name, const size_t count)
     {
@@ -75,82 +75,111 @@ namespace test_type_safe
         test::check(con, table, count);
     }
 
-} // namespace test_type_safe
+} // namespace test_variable
 
-static const char* base = "00-typesafe.db";
+static const char* base = "00-variable.db";
 
 //==============================================================================
 //==============================================================================
 
 TEST_COMPONENT(000)
 {
+    //--- идеальный случай
+    //--- запрашиваем одно знвчение, и получаем одно значение.
     ASSERT_NO_THROW(staff::dbaseDelete(base));
     {
         //--- create database
         db::connection con = db::connect(base, db::eCREATE);
-        ASSERT_TRUE(!con.existTable("users"));
 
-        //--- create table and check content
-        test::checkTable(con, "users" , 10);
-        test::checkTable(con, "client", 10);
-        test::checkTable(con, "mini"  , 2 );
+        //--- create table
+        staff::makeTable(con, "users");
+        for(size_t i = 3; i != 10; ++i)
+            staff::addToTable(con, i, i*2);
+
+        str_t dst;
+        const char* sql = "select count() from users";
+        ASSERT_NO_THROW(con << sql >> dst);
+        ASSERT_TRUE(dst == "7");
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 
 TEST_COMPONENT(001)
 {
+    //--- хотим получить одно значение
+    //--- но при этом запросили целую строку
+    
+    //--- это не логично, но теоретически имеет место быть
+    //--- в этом случае наша переменная получит значение первого столбца ответа.
+    //--- остальные столбцы будут проигнорированны
+
     ASSERT_NO_THROW(staff::dbaseDelete(base));
     {
         //--- create database
         db::connection con = db::connect(base, db::eCREATE);
-        ASSERT_TRUE(!con.existTable("users"));
 
         //--- create table
         staff::makeTable(con, "users");
+        for(size_t i = 3; i != 10; ++i)
+            staff::addToTable(con, i, i*2);
 
-        //--- using incorrect arguments
-        //--- столбец 'login' - PRIMARY KEY
-        //--- в него можно вставить только числа из диапазона int64_t
-        //
-        //--- мы попытается вставить текст вместо числа.
-        //--- должна сработать защита
-        const char* sql = "insert into users (login, age) values (?,?)";
-        #ifdef NDEBUG
-            ASSERT_ANY_THROW(con << sql << "login" << 1);            
-        #else
-            ASSERT_DEATH_DEBUG(con << sql << "login" << 1);
-        #endif
+        const char* sql = "select * from users where login = 3";
+
+        str_t dst;
+        ASSERT_NO_THROW(con << sql >> dst);
+        ASSERT_TRUE(dst == "3");
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 
 TEST_COMPONENT(002)
 {
+    //--- хотим получить одно значение
+    //--- но при этом запросили сразу несколько строк ответа
+
+    //--- это не логично, но теоретически имеет место быть.
+    //--- RELEASE
+    //---   в этом случае считываем значение первого столбика первой строки
+    //---   остальные строки будут проигнорированы
+
+    //--- DEBUG
+    //---   должен сработать assert
+
     ASSERT_NO_THROW(staff::dbaseDelete(base));
     {
         //--- create database
         db::connection con = db::connect(base, db::eCREATE);
-        ASSERT_TRUE(!con.existTable("users"));
 
         //--- create table
         staff::makeTable(con, "users");
+        for(size_t i = 3; i != 10; ++i)
+            staff::addToTable(con, i, i*2);
 
-        // std::cout << "begin\n";
-
-        //--- если столбик не является PRIMARY KEY,
-        //--- то sqlite3 позволяет пихать в него всё, что угодно.
-        //--- столбец 'age' имеет тип INTEGER
-        //--- а мы запихаем туда текст
-        //--- и вставка должна пройти успешно
-        const char* sql = "insert into users (login, age) values (?,?)";
-        ASSERT_NO_THROW(con << sql << 1 << "text");
+        str_t dst;
+        const char* sql = "select * from users";
+        
+        #ifdef NDEBUG
+            ASSERT_NO_THROW(con << sql >> dst);
+            ASSERT_TRUE(dst == "3"); 
+        #else
+            ASSERT_DEATH_DEBUG(con << sql >> dst);
+        #endif
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 
 TEST_COMPONENT(003)
 {
+    //--- хотим получить одно значение
+    //--- но база прислала нам пустой ответ.
+
+    //--- это не логично, но теоретически имеет место быть.
+    //--- RELEASE
+    //---   std::runtime_error
+
+    //--- DEBUG
+    //---   должен сработать assert
+
     ASSERT_NO_THROW(staff::dbaseDelete(base));
     {
         //--- create database
@@ -158,26 +187,21 @@ TEST_COMPONENT(003)
 
         //--- create table
         staff::makeTable(con, "users");
-        for(size_t i = 0; i != 10; ++i)
-            staff::addToTable(con, i, i);
+        for(size_t i = 3; i != 10; ++i)
+            staff::addToTable(con, i, i*2);
 
-        const char* sql = "select count() from users";
-
-        //--- запрашиваем количество записей.
-        //--- тип получателя указываем корректным
-        size_t count = 0;
-        ASSERT_NO_THROW(con << sql >> count);
-        ASSERT_TRUE(count == 10);
-
-        //--- запрашиваем количество записей.
-        //--- тип получателя - std::string
         str_t dst;
-        ASSERT_NO_THROW(con << sql >> dst);
-        ASSERT_TRUE(dst == "10");
+        const char* sql = "SELECT * FROM users WHERE login = 1000";
+        
+        #ifdef NDEBUG
+            ASSERT_ANY_THROW(con << sql >> dst);
+        #else
+            ASSERT_DEATH_DEBUG(con << sql >> dst);
+        #endif
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 
 //==============================================================================
 //==============================================================================
-#endif // ! TEST_TYPE_SAFE
+#endif // ! TEST_VARIABLE

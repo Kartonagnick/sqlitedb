@@ -93,8 +93,8 @@ namespace db
             using y = ::std::remove_reference_t<T>;
             using x = ::std::remove_cv_t<y>;
             const auto yes = owner.next();
-            assert(yes); 
-            (void)yes;
+            if (!yes)
+                throw std::runtime_error("[cursor::get] unexpectedly no data");
             dst = owner.template getValue<x>(0);
             assert(!owner.next());
         }

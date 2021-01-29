@@ -29,8 +29,8 @@ TEST_COMPONENT(000)
     ASSERT_TRUE(!staff::fileExists(filename));
     {
         const auto connect = db::connect(filename, db::eCREATE);
-        ASSERT_NO_THROW(staff::makeTableAge(connect, "age"));
-        ASSERT_NO_THROW(staff::addToAgeTable(connect, 1, 2));
+        ASSERT_NO_THROW(staff::makeTable(connect, "age"));
+        ASSERT_NO_THROW(staff::addToTable(connect, "age", 1, 2));
     }
     ASSERT_TRUE(staff::dbaseDelete(filename));
 }
@@ -58,9 +58,9 @@ TEST_COMPONENT(002)
     {
         const auto conn = db::connect(filename);
         #ifdef NDEBUG
-            ASSERT_ANY_THROW(staff::makeTableAge(conn, "age"));
+            ASSERT_ANY_THROW(staff::makeTable(conn, "age"));
         #else
-            ASSERT_DEATH_DEBUG(staff::makeTableAge(conn, "age"));
+            ASSERT_DEATH_DEBUG(staff::makeTable(conn, "age"));
         #endif
     }
     ASSERT_TRUE(staff::dbaseDelete(filename));
@@ -88,10 +88,10 @@ TEST_COMPONENT(004)
     ASSERT_NO_THROW(db::connect(filename, db::eCREATE));
     {
         const auto conn = db::connect(filename, db::eREADWRITE);
-        ASSERT_NO_THROW(staff::makeTableAge(conn, "age"));
-        ASSERT_NO_THROW(staff::addToAgeTable(conn, 1,1));
-        ASSERT_NO_THROW(staff::addToAgeTable(conn, 2,2));
-        ASSERT_NO_THROW(staff::addToAgeTable(conn, 3,3));
+        ASSERT_NO_THROW(staff::makeTable(conn, "users"));
+        ASSERT_NO_THROW(staff::addToTable(conn, 1,1));
+        ASSERT_NO_THROW(staff::addToTable(conn, 2,2));
+        ASSERT_NO_THROW(staff::addToTable(conn, 3,3));
     }
     ASSERT_TRUE(staff::dbaseDelete(filename));
 }

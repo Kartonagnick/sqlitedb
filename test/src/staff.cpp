@@ -127,7 +127,7 @@ namespace staff_sqlitedb
 //==============================================================================
 namespace staff_sqlitedb
 {
-    void makeTableAge(const db::connection& conn, const str_t& table)
+    void makeTable(const db::connection& conn, const str_t& table)
     {
         const str_t sql = "CREATE TABLE " + table + 
 R"RAW((
@@ -138,23 +138,35 @@ R"RAW((
          conn << sql;
     }
 
-    void makeTableAge(const str_t& base, const str_t& table)
+    void makeTable(const str_t& base, const str_t& table)
     {
          db::connection conn = db::connect(base, db::eCREATE);
-         makeTableAge(conn, table);
+         makeTable(conn, table);
     }
 
-    void addToUsersTable(const db::connection& base, const size_t login, const size_t age)
+    void addToTable(const db::connection& base, const str_t& table, const size_t login, const size_t age)
     {
-        const str_t sql = "insert into users (login, age) values (?,?)";
+        const str_t sql = "insert into " + table + " (login, age) values (?,?)";
         base << sql << login << age;
     }
 
-    void addToUsersTable(const str_t& path, const size_t login, const size_t age)
+    void addToTable(const db::connection& base, const size_t login, const size_t age)
+    {
+        addToTable(base, "users", login, age);
+    }
+
+    void addToTable(const str_t& path, const str_t& table, const size_t login, const size_t age)
     {
         assert(!path.empty());
+        assert(!table.empty());
         const auto con = db::connect(path, db::eREADWRITE);
-        addToUsersTable(con, login, age);
+        addToTable(con, table, login, age);
+    }
+
+    void addToTable(const str_t& path, const size_t login, const size_t age)
+    {
+        assert(!path.empty());
+        addToTable(path, "users", login, age);
     }
 
 } // namespace staff_sqlitedb

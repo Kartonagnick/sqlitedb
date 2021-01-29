@@ -62,7 +62,7 @@ TEST_COMPONENT(003)
 
     staff::dbaseDelete(base);
 
-    ASSERT_NO_THROW(staff::makeTableAge(base, table));
+    ASSERT_NO_THROW(staff::makeTable(base, table));
     ASSERT_TRUE(staff::fileExists(base));
     ASSERT_TRUE(db::existTable(base, table));
     ASSERT_TRUE(!db::existTable(base, "noexist"));

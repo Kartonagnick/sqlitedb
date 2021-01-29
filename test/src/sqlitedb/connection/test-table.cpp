@@ -33,8 +33,8 @@ namespace
 TEST_COMPONENT(000)
 {
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "clients"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "clients"));
     {
         const auto con = db::connect(base);
         ASSERT_TRUE( con.existTable("users"   ));
@@ -69,8 +69,8 @@ TEST_COMPONENT(003)
 TEST_COMPONENT(004)
 {
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "clients"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "clients"));
     {
         const auto con = db::connect(base, db::eREADWRITE);
         ASSERT_TRUE( con.existTable("users"   ));
@@ -93,7 +93,7 @@ TEST_COMPONENT(005)
 {
     const char* table = nullptr;
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
     const auto con = db::connect(base, db::eREADWRITE);
     ASSERT_DEATH_DEBUG(con.dropTable(table));
 }
@@ -101,7 +101,7 @@ TEST_COMPONENT(006)
 {
     const char* table = "";
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
     const auto con = db::connect(base, db::eREADWRITE);
     ASSERT_DEATH_DEBUG(con.dropTable(table));
 }
@@ -109,7 +109,7 @@ TEST_COMPONENT(007)
 {
     const str_t table = "";
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
     const auto con = db::connect(base, db::eREADWRITE);
     ASSERT_DEATH_DEBUG(con.dropTable(table));
 }

@@ -33,7 +33,7 @@ namespace
 TEST_COMPONENT(000)
 {
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
     {
         const auto con = db::connect(base);
         ASSERT_TRUE( con.existTable("users"));
@@ -47,7 +47,7 @@ TEST_COMPONENT(000)
 TEST_COMPONENT(001)
 {
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
     {
         const auto con = db::connect(base);
         ASSERT_TRUE( con.existTable("users"));
@@ -83,7 +83,7 @@ TEST_COMPONENT(002)
 {
     // --- prepare
     ASSERT_NO_THROW(staff::dbaseDelete(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, "users"));
+    ASSERT_NO_THROW(staff::makeTable(base, "users"));
 }
 
 TEST_COMPONENT(003)

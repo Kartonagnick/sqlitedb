@@ -47,7 +47,7 @@ TEST_COMPONENT(002)
     const char* table = "age";
     staff::fileDelete(base);
     ASSERT_TRUE(!staff::fileExists(base));
-    ASSERT_NO_THROW(staff::makeTableAge(base, table));
+    ASSERT_NO_THROW(staff::makeTable(base, table));
 
     ASSERT_TRUE( db::dropTable(base, table));
     ASSERT_TRUE(!db::dropTable(base, "noexist"));

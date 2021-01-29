@@ -35,7 +35,6 @@
     #define TEST_EXISTS_COLUMN                              // ready!
     #define TEST_DROP_DATABASE                              // ready!
     #define TEST_DROP_TABLE                                 // ready!
-
 //==============================================================================
 //===== sqlitedb/connect ===================================||==================
     #define TEST_CONNECT                                    // ready!
@@ -44,6 +43,10 @@
     #define TEST_TABLE                                      // ready!
     #define TEST_COLUMN                                     // ready!
     #define TEST_OPERATOR_SQL                               // ready!
+//==============================================================================
+//===== sqlitedb/request ===================================||==================
+    #define TEST_TYPE_SAFE                                  // ready!
+    #define TEST_VARIABLE                                   // ready!
 //==========================================================||==================
 //==============================================================================
 
