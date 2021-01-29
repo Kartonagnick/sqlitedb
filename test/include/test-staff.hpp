@@ -36,8 +36,8 @@ namespace staff_sqlitedb
 
     void makeTableAge(const db::connection& base, const str_t& table);
 
-    void addToAgeTable(const str_t& path, const int login, const size_t age);
-    void addToAgeTable(const db::connection& base, const int login, const size_t age);
+    void addToUsersTable(const str_t& path, const size_t login, const size_t age);
+    void addToUsersTable(const db::connection& base, const size_t login, const size_t age);
 
 } // namespace staff_sqlitedb
 

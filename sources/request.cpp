@@ -10,8 +10,6 @@
 #include <cassert>
 #include <cstring>
 
-#include <iostream>
-
 //==============================================================================
 //=== [integer] ================================================================
 namespace db
@@ -96,29 +94,17 @@ namespace db
     request::~request() noexcept(false)
     {
         this->endQuery();
-        #if 0
-        try
-        {
-            
-        }
-        catch (...)
-        {
-            assert(false && "exception in '~request()'");
-        }
-        #endif
     }
-
 
     bool request::next() 
     { 
         assert(this->m_cursor);
         const auto code = ::sqlite3_step(this->m_cursor);
         assert(code == SQLITE_ROW || code == SQLITE_DONE);
+
         if (code != SQLITE_ROW && code != SQLITE_DONE)
-        {
-            //std::cout << "(db::exception): [db::next] sqlite3_step: failed\n";
             throw db::exception(code, "[db::next] sqlite3_step: failed");
-        }
+
         return code == SQLITE_ROW;
     }
 

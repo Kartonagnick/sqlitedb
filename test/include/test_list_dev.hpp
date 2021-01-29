@@ -39,12 +39,14 @@
     // #define TEST_CONNECT                                 // ready!
 //==============================================================================
 //===== sqlitedb/connection ================================||==================
-    #define TEST_TABLE                                      // ready!
-    #define TEST_COLUMN                                     // ready!
-    #define TEST_OPERATOR_SQL                               // ready!
+    // #define TEST_TABLE                                   // ready!
+    // #define TEST_COLUMN                                  // ready!
+    // #define TEST_OPERATOR_SQL                            // ready!
 //==============================================================================
 //===== sqlitedb/request ===================================||==================
-    // #define TEST_TYPE_SAFE                               // in progress...
+    #define TEST_TYPE_SAFE                                  // in progress...
+    // #define TEST_CONTENT                                 // in progress...
+    
 //==========================================================||==================
 //==============================================================================
 

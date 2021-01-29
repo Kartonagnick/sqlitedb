@@ -61,13 +61,11 @@ namespace staff_sqlitedb
         return d1 || d2;
     }
 
-
     bool dbaseDelete(const char* path) noexcept
     {
         assert(path);
         namespace me = staff_sqlitedb;
         return me::dbaseDelete(str_t(path));
-
     }
 
     bool fileExists(const str_t& path) noexcept
@@ -146,17 +144,17 @@ R"RAW((
          makeTableAge(conn, table);
     }
 
-    void addToAgeTable(const db::connection& base, const int login, const size_t age)
+    void addToUsersTable(const db::connection& base, const size_t login, const size_t age)
     {
-        const str_t sql = "insert into age (login, age) values (?,?)";
+        const str_t sql = "insert into users (login, age) values (?,?)";
         base << sql << login << age;
     }
 
-    void addToAgeTable(const str_t& path, const int login, const size_t age)
+    void addToUsersTable(const str_t& path, const size_t login, const size_t age)
     {
         assert(!path.empty());
         const auto con = db::connect(path, db::eREADWRITE);
-        addToAgeTable(con, login, age);
+        addToUsersTable(con, login, age);
     }
 
 } // namespace staff_sqlitedb
