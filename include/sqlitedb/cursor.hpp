@@ -180,7 +180,7 @@ namespace db
 
             using foo = decltype(&Lambda::operator());
 			enum { args = detail::get_args<foo>::value };
-            static_assert(args > 0, "not support: zero arguments");
+            static_assert(args > 0, "not support: zero arguments of callback");
             cursor::template check(owner, args, "lambda`s arguments");
             size_t count = 0;
             while(owner.next())

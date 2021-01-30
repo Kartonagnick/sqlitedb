@@ -58,7 +58,7 @@ TEST_COMPONENT(000)
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
-#if 0
+
 TEST_COMPONENT(001)
 {
     //--- запрашиваем одну строку и получаем одну строку
@@ -74,12 +74,18 @@ TEST_COMPONENT(001)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
-        std::tuple<str_t> dst;
+        str_t login;
+        size_t index = 0;
+        const auto dst = [&index, &login](str_t login_)
+        {
+            ++index;
+            login = std::move(login_);
+            return true;
+        };
         const char* sql = "select * from users where login = 3";
         ASSERT_NO_THROW(con << sql >> dst);
-
-        str_t& login = std::get<0>(dst);
         ASSERT_TRUE(login == "3");
+        ASSERT_TRUE(index == 1);
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
@@ -99,11 +105,26 @@ TEST_COMPONENT(002)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
-        std::tuple<str_t, str_t, int> dst;
+        size_t index = 0;
+        int login = -1;
+        int age   = -1;
+        int dummy = -1;
+        const auto dst = [&index, &login, &age, &dummy](int login_, int age_, int dummy_)
+        {
+            ++index;
+            login = login_;
+            age   = age_;
+            dummy = dummy_;
+            return true;
+        };
         const char* sql = "select * from users where login = 3";
 
         #ifdef NDEBUG
             ASSERT_ANY_THROW(con << sql >> dst);
+            ASSERT_TRUE(index ==  0);
+            ASSERT_TRUE(login == -1);
+            ASSERT_TRUE(age   == -1);
+            ASSERT_TRUE(dummy == -1);
         #else
             ASSERT_DEATH_DEBUG(con << sql >> dst);
         #endif
@@ -113,7 +134,6 @@ TEST_COMPONENT(002)
 
 TEST_COMPONENT(003)
 {
-    //--- prepare
     //--- запрашиваем одну строку, а получаем множество.
     ASSERT_NO_THROW(staff::dbaseDelete(base));
 
@@ -123,36 +143,26 @@ TEST_COMPONENT(003)
     //--- create table
     staff::makeTable(con, "users");
     for(size_t i = 3; i != 10; ++i)
-        staff::addToTable(con, i, i*2);
-}
+        staff::addToTable(con, i, i * 2);
 
-TEST_COMPONENT(004)
-{
-    //--- реализация
-    //--- запрашиваем одну строку, а получаем множество.
-    
-    db::connection con = db::connect(base, db::eREADWRITE);
     const char* sql = "select * from users";
-    std::tuple<str_t, str_t> dst;
+    int index = 0;
+    const auto dst = [&index](int login, int age)
+    {
+        const int etalon_login = index + 3;
+        const int etalon_age = etalon_login * 2;
+        ++index;
+        EXPECT_TRUE(login == etalon_login);
+        EXPECT_TRUE(age   == etalon_age  );
+        return index != 6;
+    };
 
-    #ifdef NDEBUG
-        ASSERT_NO_THROW(con << sql >> dst);
-        str_t& login = std::get<0>(dst);
-        str_t& age   = std::get<1>(dst);
-        ASSERT_TRUE(login == "3");
-        ASSERT_TRUE(age   == "6");
-    #else
-        ASSERT_DEATH_DEBUG(con << sql >> dst);
-    #endif
-}
+    ASSERT_NO_THROW(con << sql >> dst);
+    ASSERT_TRUE(index == 6);
 
-TEST_COMPONENT(005)
-{
     //--- очистка
-    //--- запрашиваем одну строку, а получаем множество.
     ASSERT_NO_THROW(staff::dbaseDelete(base));
 }
-
 
 TEST_COMPONENT(006)
 {
@@ -168,12 +178,20 @@ TEST_COMPONENT(006)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
-        std::tuple<str_t, str_t> dst{ "aa", "bb" };
+        size_t index = 0;
+        str_t login = "aa";
+        str_t age = "bb";
+        const auto dst = [&index, &login, &age](str_t login_, str_t age_)
+        {
+            ++index;
+            login = std::move(login_);
+            age   = std::move(age_);
+            return true;
+        };
         const char* sql = "select * from users where login = 1000";
 
         ASSERT_NO_THROW(con << sql >> dst);
-        str_t& login = std::get<0>(dst);
-        str_t& age   = std::get<1>(dst);
+        ASSERT_TRUE(index == 0);
         ASSERT_TRUE(login == "aa");
         ASSERT_TRUE(age   == "bb");
     }
@@ -183,7 +201,7 @@ TEST_COMPONENT(006)
 #if 0
 TEST_COMPONENT(007)
 {
-    //--- пуcтой std::tuple<>
+    //--- лямбда без аргументов
     //--- запрещен времени компиляции
     
     ASSERT_NO_THROW(staff::dbaseDelete(base));
@@ -196,14 +214,14 @@ TEST_COMPONENT(007)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
-        std::tuple<> dst;
+        const auto dst = []() { return true; };
         const char* sql = "select * from users";
         con << sql >> dst;
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 #endif
-#endif
+
 //==============================================================================
 //==============================================================================
 #endif // ! TEST_LAMBDA

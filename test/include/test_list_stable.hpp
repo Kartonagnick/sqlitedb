@@ -49,6 +49,7 @@
     #define TEST_VARIABLE                                   // ready!
     #define TEST_TUPLE                                      // ready!
     #define TEST_TUPLE_TIE                                  // ready!
+    #define TEST_LAMBDA                                     // ready!
 //==========================================================||==================
 //==============================================================================
 
