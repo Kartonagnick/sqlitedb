@@ -178,6 +178,70 @@ TEST_COMPONENT(003)
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 
+
+//--- prepare
+TEST_COMPONENT(004)
+{
+    ASSERT_NO_THROW(staff::dbaseDelete(base));
+
+    //--- create database
+    db::connection con = db::connect(base, db::eCREATE);
+
+    //--- create table
+    staff::makeTable(con, "users");
+    for(size_t i = 0; i != 10; ++i)
+        staff::addToTable(con, i, i);
+}
+
+TEST_COMPONENT(005)
+{
+    //--- рассматирваем ситуацию,
+    //--- когда количество аргументов запроса не хватает.
+
+    ASSERT_NO_THROW(staff::fileExists(base));
+    {
+        //--- create database
+        db::connection con = db::connect(base, db::eREADWRITE);
+
+        // --- аргументов в запросе указанно 2
+        const char* sql = "select count(*) from users where login = ? and age = ?";
+        size_t count = 0;
+
+        //--- а мы передаем только один
+        #ifdef NDEBUG
+            ASSERT_ANY_THROW(con << sql << 0  >> count);
+        #else
+            ASSERT_DEATH_DEBUG(con << sql << 0 >> count);
+        #endif 
+    }
+}
+
+TEST_COMPONENT(006)
+{
+    //--- рассматирваем ситуацию,
+    //--- когда количество аргументов запроса слишком много
+
+    db::connection con = db::connect(base, db::eREADWRITE);
+
+    // --- аргументов в запросе указанно 2
+    const char* sql = "select count(*) from users where login = ? and age = ?";
+
+    //--- а мв передаем сразу 3
+    #ifdef NDEBUG
+        ASSERT_ANY_THROW(con << sql << 0 << 0 << 0);
+
+    #else
+        ASSERT_DEATH_DEBUG(con << sql << 0 << 0 << 0);
+
+    #endif // !NDEBUG
+}
+
+//--- done
+TEST_COMPONENT(007)
+{
+    ASSERT_TRUE(staff::dbaseDelete(base));
+}
+
 //==============================================================================
 //==============================================================================
 #endif // ! TEST_TYPE_SAFE

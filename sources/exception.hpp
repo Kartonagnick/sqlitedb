@@ -34,6 +34,9 @@ namespace db
             eTABLE_DOES_NOT_EXIST  = 200,  
         };
 
+        static const char* code2desc(const int code) noexcept;
+        static const char* code2text(const int code) noexcept;
+
     public:
         explicit exception(const int code, str_t msg) noexcept
             : base(::std::move(msg))

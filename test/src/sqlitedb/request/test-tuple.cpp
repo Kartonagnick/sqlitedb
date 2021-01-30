@@ -3,10 +3,10 @@
 //==============================================================================
 //==============================================================================
 
-#ifdef TEST_TUPLE_TIE
+#ifdef TEST_TUPLE
 
 #define dTEST_COMPONENT db, request
-#define dTEST_METHOD tie
+#define dTEST_METHOD tuple
 #define dTEST_TAG tdd
 
 #include "test-staff.hpp"
@@ -18,7 +18,7 @@ using str_t = ::std::string;
 //==============================================================================
 //==============================================================================
 
-static const char* base = "00-tie.db";
+static const char* base = "00-tuple.db";
 
 //==============================================================================
 //==============================================================================
@@ -39,12 +39,11 @@ TEST_COMPONENT(000)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
-        int login = -1;
-        int age = -1;
+        std::tuple<int, int> dst;
         const char* sql = "select * from users where login = 3";
-        ASSERT_NO_THROW(con << sql >> std::tie(login, age));
-        ASSERT_TRUE(login == 3);
-        ASSERT_TRUE(age   == 6);
+        ASSERT_NO_THROW(con << sql >> dst);
+        ASSERT_TRUE(3 == std::get<0>(dst));
+        ASSERT_TRUE(6 == std::get<1>(dst));
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
@@ -64,10 +63,10 @@ TEST_COMPONENT(001)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
-        str_t login;
+        std::tuple<str_t> dst;
         const char* sql = "select * from users where login = 3";
-        ASSERT_NO_THROW(con << sql >> std::tie(login));
-        ASSERT_TRUE(login == "3");
+        ASSERT_NO_THROW(con << sql >> dst);
+        ASSERT_TRUE("3" == std::get<0>(dst));
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
@@ -87,15 +86,13 @@ TEST_COMPONENT(002)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
-        str_t login;
-        str_t age;
-        int dummy;
+        std::tuple<str_t, str_t, int> dst;
         const char* sql = "select * from users where login = 3";
 
         #ifdef NDEBUG
-            ASSERT_ANY_THROW(con << sql >> std::tie(login, age, dummy));
+            ASSERT_ANY_THROW(con << sql >> dst);
         #else
-            ASSERT_DEATH_DEBUG(con << sql >> std::tie(login, age, dummy));
+            ASSERT_DEATH_DEBUG(con << sql >> dst);
         #endif
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
@@ -123,15 +120,15 @@ TEST_COMPONENT(004)
     
     db::connection con = db::connect(base, db::eREADWRITE);
     const char* sql = "select * from users";
-    str_t login;
-    str_t age;
+
+    std::tuple<str_t, str_t> dst;
 
     #ifdef NDEBUG
-        ASSERT_NO_THROW(con << sql >> std::tie(login, age));
-        ASSERT_TRUE(login == "3");
-        ASSERT_TRUE(age   == "6");
+        ASSERT_NO_THROW(con << sql >> dst);
+        ASSERT_TRUE("3" == std::get<0>(dst));
+        ASSERT_TRUE("6" == std::get<1>(dst));
     #else
-        ASSERT_DEATH_DEBUG(con << sql >> std::tie(login, age));
+        ASSERT_DEATH_DEBUG(con << sql >> dst);
     #endif
 }
 
@@ -157,13 +154,12 @@ TEST_COMPONENT(006)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
-        str_t login = "aa";
-        str_t age = "bb";
+        std::tuple<str_t, str_t> dst{ "aa", "bb" };
         const char* sql = "select * from users where login = 1000";
 
-        ASSERT_NO_THROW(con << sql >> std::tie(login, age));
-        ASSERT_TRUE(login == "aa");
-        ASSERT_TRUE(age   == "bb");
+        ASSERT_NO_THROW(con << sql >> dst);
+        ASSERT_TRUE("aa" == std::get<0>(dst));
+        ASSERT_TRUE("bb" == std::get<1>(dst));
     }
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
@@ -184,6 +180,7 @@ TEST_COMPONENT(007)
         for(size_t i = 3; i != 10; ++i)
             staff::addToTable(con, i, i*2);
 
+        std::tuple<> dst;
         const char* sql = "select * from users";
         con << sql >> std::tie();
     }
@@ -193,4 +190,4 @@ TEST_COMPONENT(007)
 
 //==============================================================================
 //==============================================================================
-#endif // ! TEST_TUPLE_TIE
+#endif // ! TEST_TUPLE

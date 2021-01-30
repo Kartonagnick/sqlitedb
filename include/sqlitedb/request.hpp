@@ -6,6 +6,7 @@
 #define dSQLITEDB_REQUEST_USED_ 1
 
 #include <type_traits>
+#include <exception>
 #include <cstdint>
 #include <string>
 #include <atomic>
@@ -38,45 +39,38 @@ namespace db
        ~request() noexcept(false);
     public:
         template<class T>
-        request&& operator << (T&& value) && noexcept
-        { 
-            this->bind(::std::forward<T>(value));
-            return std::move(*this);
-        }
+        request&& operator << (const T& value)&&;
 
         template<class T> void operator >> (T&& dst) &&;
 
     private:
+        void check_bind_count() const;
+        size_t bind_count() const noexcept;
+
         size_t columns() const noexcept;
 
-        template<class T> auto get_value(const size_t index)
-        { 
-            using y = ::std::remove_reference_t<T>;
-            using x = ::std::remove_cv_t<y>;
-            using from = db::getval<x>;
-            return from::get(*this, index);
-        }
+        template<class T> auto get_value(const size_t index);
     private:
-        void bind(const void* blob, const size_t size) noexcept;
+        void bind(const void* blob, const size_t size);
 
-        void bind(const ::std::nullptr_t) noexcept;
+        void bind(const ::std::nullptr_t);
 
-        void bind(const bool            value) noexcept;
-        void bind(const float           value) noexcept;
-        void bind(const double          value) noexcept;
+        void bind(const bool            value);
+        void bind(const float           value);
+        void bind(const double          value);
 
-        void bind(const char*           value) noexcept;
-        void bind(const str_t&          value) noexcept;
+        void bind(const char*           value);
+        void bind(const str_t&          value);
 
-        void bind(const ::std::int8_t   value) noexcept;
-        void bind(const ::std::int16_t  value) noexcept;
-        void bind(const ::std::int32_t  value) noexcept;
-        void bind(const ::std::int64_t  value) noexcept;
+        void bind(const ::std::int8_t   value);
+        void bind(const ::std::int16_t  value);
+        void bind(const ::std::int32_t  value);
+        void bind(const ::std::int64_t  value);
 
-        void bind(const ::std::uint8_t  value) noexcept;
-        void bind(const ::std::uint16_t value) noexcept;
-        void bind(const ::std::uint32_t value) noexcept;
-        void bind(const ::std::uint64_t value) noexcept;
+        void bind(const ::std::uint8_t  value);
+        void bind(const ::std::uint16_t value);
+        void bind(const ::std::uint32_t value);
+        void bind(const ::std::uint64_t value);
     private:
         int             get_type  (const size_t index) noexcept;
         const void*     get_blob  (const size_t index) noexcept;
@@ -96,7 +90,10 @@ namespace db
     private:
         request(request&&)     noexcept;
         request(stmtT* cursor) noexcept;
-        void finalize();
+        
+        void finalize() noexcept;
+
+        void clear();
         bool next();
     private:
         stmtT* m_cursor;
@@ -134,9 +131,52 @@ namespace db
 namespace db
 {
     template<class T>
+    request&& request::operator << (const T& value) &&  
+    { 
+        ::std::exception_ptr eptr;
+        try
+        {
+            this->bind(value);
+        }
+        catch (...)
+        {
+            eptr = ::std::current_exception();
+        }
+
+        if (eptr)
+        {
+            this->finalize();
+            ::std::rethrow_exception(eptr);
+        }
+        return ::std::move(*this);
+    }
+
+    template<class T>
     void request::operator >> (T&& dst) &&
     { 
+        this->check_bind_count();
         cursor::template get(*this, dst);
+    }
+
+    template<class T> 
+    auto request::get_value(const size_t index)
+    { 
+        using y = ::std::remove_reference_t<T>;
+        using x = ::std::remove_cv_t<y>;
+        using from = db::getval<x>;
+
+        ::std::exception_ptr eptr;
+        try
+        {
+            return from::get(*this, index);
+        }
+        catch (...)
+        {
+            eptr = ::std::current_exception();
+        }
+        assert(eptr);
+        this->finalize();
+        ::std::rethrow_exception(eptr);
     }
 
 } // namespace db

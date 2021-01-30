@@ -1,5 +1,5 @@
 ﻿
-![logo](SQLiteDB25.png)
+[![logo](SQLiteDB25.png)](../README.md "for users") 
 
 Содержание:
 -----------

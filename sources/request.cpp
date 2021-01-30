@@ -22,6 +22,13 @@ namespace db
         return ::tools::assert_numeric_cast<int>(value);
     }
 
+    static inline void throwIfError(const int code)
+    {
+        assert(code == SQLITE_OK);
+        if (code != SQLITE_OK)
+            throw db::exception(code, "[request::bind] can`t bind argument");
+    }
+
 } // namespace db
 
 //==============================================================================
@@ -31,8 +38,7 @@ namespace db
     // bind
     namespace
     {
-        void bindText(stmtT* cursor, const size_t index, 
-            const char* value, const size_t len) noexcept
+        void bindText(stmtT* cursor, const size_t index, const char* value, const size_t len) 
         {
             assert(cursor);
             assert(value);
@@ -44,11 +50,10 @@ namespace db
                 ::db::integer(len), 
                 SQLITE_TRANSIENT
             );
-            assert(ret == SQLITE_OK);
-            (void)ret;
+            db::throwIfError(ret);
         }
 
-        void bindInt(stmtT* cursor, const size_t index, const int value) noexcept
+        void bindInt(stmtT* cursor, const size_t index, const int value)
         {
             assert(cursor);
             const int ret = ::sqlite3_bind_int(
@@ -56,12 +61,11 @@ namespace db
                 ::db::integer(index), 
                 value
             );
-            assert(ret == SQLITE_OK);
-            (void)ret;
+            db::throwIfError(ret);
         }
 
         template<class T> 
-        void bindIntTemplate(stmtT* cursor, sizeT& index, T value) noexcept
+        void bindIntTemplate(stmtT* cursor, sizeT& index, T value) 
         {
             assert(cursor);
             const int v = ::tools::numeric_cast<int>(value);
@@ -93,7 +97,7 @@ namespace db
 
     request::~request() noexcept(false)
     {
-        this->finalize();
+        this->clear();
     }
 
     bool request::next() 
@@ -108,14 +112,22 @@ namespace db
         return code == SQLITE_ROW;
     }
 
-    void request::finalize()  
+    void request::finalize() noexcept
+    {
+        const auto ret = ::sqlite3_finalize(this->m_cursor);
+        assert(ret == SQLITE_OK);
+		(void) ret;
+        this->m_cursor = nullptr;
+        this->m_index  = 0;
+    }
+
+    void request::clear()  
     { 
         if(!this->m_cursor)
         {
             assert(this->m_index  == 0);
             return;
         }
-
         std::exception_ptr eptr;
         try
         {
@@ -125,17 +137,12 @@ namespace db
         {
             eptr = std::current_exception();
         }
-        const auto ret = ::sqlite3_finalize(this->m_cursor);
-        assert(ret == SQLITE_OK);
-		(void) ret;
-        this->m_cursor = nullptr;
-        this->m_index  = 0;
-
+        this->finalize();
         if (eptr)
             std::rethrow_exception(eptr);
     }
 
-    void request::bind(const void* value, const size_t size) noexcept
+    void request::bind(const void* value, const size_t size) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
@@ -146,11 +153,10 @@ namespace db
             ::db::integer(size), 
             SQLITE_TRANSIENT
         );
-        assert(ret == SQLITE_OK);
-        (void)ret;
+        db::throwIfError(ret);
     }
 
-    void request::bind(const ::std::nullptr_t) noexcept
+    void request::bind(const ::std::nullptr_t) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
@@ -158,12 +164,11 @@ namespace db
             this->m_cursor, 
             ::db::integer(this->m_index)
         );
-        assert(ret == SQLITE_OK);
-        (void)ret;
+        db::throwIfError(ret);
         ++this->m_index;
     }
 
-    void request::bind(const char* value) noexcept
+    void request::bind(const char* value) 
     {
         assert(this->m_index > 0);
         assert(value);
@@ -177,7 +182,7 @@ namespace db
         ++this->m_index;
     }
 
-    void request::bind(const str_t& value) noexcept
+    void request::bind(const str_t& value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
@@ -190,7 +195,7 @@ namespace db
         ++this->m_index;
     }
                                                  
-    void request::bind(const float value) noexcept
+    void request::bind(const float value) 
     {
         assert(this->m_cursor);
         assert(this->m_index > 0);
@@ -198,7 +203,7 @@ namespace db
         this->bind(v);
     }
 
-    void request::bind(const double value) noexcept
+    void request::bind(const double value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
@@ -207,12 +212,11 @@ namespace db
             ::db::integer(this->m_index),
             value
         );
-        assert(ret == SQLITE_OK);
-        (void)ret;
+        db::throwIfError(ret);
         ++this->m_index;
     }
     
-    void request::bind(const bool value) noexcept
+    void request::bind(const bool value) 
     {
         assert(this->m_cursor);
         assert(this->m_index > 0);
@@ -220,56 +224,56 @@ namespace db
         return this->bind(v);
     }
 
-    void request::bind(const ::std::int8_t value) noexcept
+    void request::bind(const ::std::int8_t value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void request::bind(const ::std::int16_t value) noexcept
+    void request::bind(const ::std::int16_t value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void request::bind(const ::std::int32_t value) noexcept
+    void request::bind(const ::std::int32_t value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void request::bind(const ::std::int64_t value) noexcept
+    void request::bind(const ::std::int64_t value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void request::bind(const ::std::uint8_t value) noexcept
+    void request::bind(const ::std::uint8_t value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void request::bind(const ::std::uint16_t value) noexcept
+    void request::bind(const ::std::uint16_t value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void request::bind(const ::std::uint32_t value) noexcept
+    void request::bind(const ::std::uint32_t value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
         ::db::bindIntTemplate(this->m_cursor, this->m_index, value);
     }
 
-    void request::bind(const ::std::uint64_t value) noexcept
+    void request::bind(const ::std::uint64_t value) 
     {
         assert(this->m_index > 0);
         assert(this->m_cursor);
@@ -283,6 +287,29 @@ namespace db
 
 namespace db
 {
+    void request::check_bind_count() const 
+    {
+        const size_t count = this->bind_count();
+        assert(this->m_index == count + 1);
+        if (this->m_index == count + 1)
+            return;
+
+        const str_t sc = std::to_string(count);
+        const str_t sp = std::to_string(this->m_index - 1);
+        throw ::std::logic_error(
+            "[request::check_bind_count] "
+                "expected " + sc + " arguments, but passed " + sp
+        );
+    }
+
+    size_t request::bind_count() const noexcept
+    {
+        assert(this->m_cursor);
+		return ::tools::assert_numeric_cast<size_t>(
+            ::sqlite3_bind_parameter_count(this->m_cursor)
+        );
+    }
+
     size_t request::columns() const noexcept
     {
         assert(this->m_cursor);
