@@ -13,69 +13,10 @@
 #include <sqlitedb/sqlitedb.hpp>
 
 namespace staff = staff_sqlitedb;
-namespace test_variable {}
-namespace test = test_variable;
 using str_t = ::std::string;
 
 //==============================================================================
 //==============================================================================
-
-namespace test_variable
-{
-    void addData(const db::connection& con, const str_t& name, const size_t count)
-    {
-        // dprint(std::cout << "src:\n");
-        const str_t sql = "insert into " + name + "(login, age) values (?,?)";
-        for (size_t i = 0; i != count; ++i)
-        {
-            const size_t login = i;
-            const size_t age = 5 + i * 2;
-            // dprint(std::cout << i << ") login = " << login << ", age = " << age << '\n');
-            con << sql << login << age;
-        }
-    }
-
-    void check(const db::connection& con, const str_t& name, const size_t count)
-    {
-        // dprint(std::cout << "dst:\n");
-        size_t index = 0;
-        const str_t sql = "select * from " + name;
-        const auto lambda = [&index, &count](const size_t login, const size_t age)
-        {
-            // dprint(std::cout << index << ") login = " << login << ", age = " << age << '\n');
-            EXPECT_TRUE(login == index);
-            EXPECT_TRUE(age == 5 + index * 2);
-            return (++index) != count - 1;
-        };
-        con << sql >> lambda;
-        ASSERT_TRUE(index == count - 1);
-    }
-
-    void makeTable(const db::connection& con, const str_t& table)
-    {
-        const str_t sql = "CREATE TABLE " + table + 
-        R"RAW((
-            login  INTEGER PRIMARY KEY,
-            age    INTEGER NOT NULL
-        ))RAW";
-
-        con << sql;
-    }
-
-    void checkTable(const db::connection& con, const str_t& table, const size_t count)
-    {
-        //--- create table
-        test::makeTable(con, table);
-        ASSERT_TRUE(con.existTable(table));
-
-        //--- add data
-        test::addData(con, table, count);
-
-        //--- read data
-        test::check(con, table, count);
-    }
-
-} // namespace test_variable
 
 static const char* base = "00-variable.db";
 

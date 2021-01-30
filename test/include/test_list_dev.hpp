@@ -45,9 +45,13 @@
 //==============================================================================
 //===== sqlitedb/request ===================================||==================
     // #define TEST_TYPE_SAFE                               // ready!
-    #define TEST_VARIABLE                                   // ready!
+    // #define TEST_VARIABLE                                // ready!
+    // #define TEST_TUPLE                                   // ready!
+    // #define TEST_TUPLE_TIE                               // ready!
+    #define TEST_LAMBDA                                     // in progress...
     
 //==========================================================||==================
 //==============================================================================
+// in progress...
 
 #endif // !dTEST_LIST_DEV_USED_

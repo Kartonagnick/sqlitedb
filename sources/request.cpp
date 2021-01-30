@@ -93,7 +93,7 @@ namespace db
 
     request::~request() noexcept(false)
     {
-        this->endQuery();
+        this->finalize();
     }
 
     bool request::next() 
@@ -108,7 +108,7 @@ namespace db
         return code == SQLITE_ROW;
     }
 
-    void request::endQuery()  
+    void request::finalize()  
     { 
         if(!this->m_cursor)
         {
@@ -283,9 +283,18 @@ namespace db
 
 namespace db
 {
+    size_t request::columns() const noexcept
+    {
+        assert(this->m_cursor);
+		return ::tools::assert_numeric_cast<size_t>(
+            ::sqlite3_column_count(this->m_cursor)
+        );
+    }
+
     int request::get_type(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         return ::sqlite3_column_type(
             this->m_cursor, ::db::integer(index)
         );
@@ -294,6 +303,7 @@ namespace db
     const void* request::get_blob(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         return ::sqlite3_column_blob(
             this->m_cursor, ::db::integer(index)
         );
@@ -302,6 +312,7 @@ namespace db
     size_t request::get_bytes(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto bytes = ::sqlite3_column_bytes(
             this->m_cursor, ::db::integer(index)
         );
@@ -312,6 +323,7 @@ namespace db
     str_t request::get_text(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto* result = ::sqlite3_column_text(
             this->m_cursor, ::db::integer(index)
         );
@@ -322,6 +334,7 @@ namespace db
     double request::get_double(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         return ::sqlite3_column_double(
             this->m_cursor, ::db::integer(index)
         );
@@ -330,6 +343,7 @@ namespace db
     float request::get_float(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_double(
             this->m_cursor, ::db::integer(index)
         );
@@ -339,6 +353,7 @@ namespace db
     bool request::get_bool(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int(
             this->m_cursor, ::db::integer(index)
         );
@@ -348,6 +363,7 @@ namespace db
     ::std::int8_t request::get_int8(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int(
             this->m_cursor, ::db::integer(index)
         );
@@ -357,6 +373,7 @@ namespace db
     ::std::int16_t request::get_int16(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int(
             this->m_cursor, ::db::integer(index)
         );
@@ -366,6 +383,7 @@ namespace db
     ::std::int32_t request::get_int32(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int(
             this->m_cursor, ::db::integer(index)
         );
@@ -375,6 +393,7 @@ namespace db
     ::std::int64_t request::get_int64(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int64(
             this->m_cursor, ::db::integer(index)
         );
@@ -384,6 +403,7 @@ namespace db
     ::std::uint8_t request::get_uint8(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int(
             this->m_cursor, ::db::integer(index)
         );
@@ -394,6 +414,7 @@ namespace db
     ::std::uint16_t request::get_uint16(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int(
             this->m_cursor, ::db::integer(index)
         );
@@ -404,6 +425,7 @@ namespace db
     ::std::uint32_t request::get_uint32(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int(
             this->m_cursor, ::db::integer(index)
         );
@@ -414,6 +436,7 @@ namespace db
     ::std::uint64_t request::get_uint64(const size_t index) noexcept
     {
         assert(this->m_cursor);
+        assert(index < this->columns());
         const auto result = ::sqlite3_column_int64(
             this->m_cursor, ::db::integer(index)
         );

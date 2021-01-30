@@ -44,11 +44,12 @@ namespace db
             return std::move(*this);
         }
 
-        template<class T>
-        void operator >> (T& dst) &&;
+        template<class T> void operator >> (T&& dst) &&;
 
     private:
-        template<class T> auto getValue(const size_t index)
+        size_t columns() const noexcept;
+
+        template<class T> auto get_value(const size_t index)
         { 
             using y = ::std::remove_reference_t<T>;
             using x = ::std::remove_cv_t<y>;
@@ -95,7 +96,7 @@ namespace db
     private:
         request(request&&)     noexcept;
         request(stmtT* cursor) noexcept;
-        void endQuery();
+        void finalize();
         bool next();
     private:
         stmtT* m_cursor;
@@ -133,7 +134,7 @@ namespace db
 namespace db
 {
     template<class T>
-    void request::operator >> (T& dst) &&
+    void request::operator >> (T&& dst) &&
     { 
         cursor::template get(*this, dst);
     }

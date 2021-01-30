@@ -7,6 +7,7 @@
 
 #include <type_traits>
 #include <cassert>
+#include <string>
 #include <tuple>
 
 //==============================================================================
@@ -33,6 +34,39 @@ namespace db
 
             enum { value = checked::value };
         };
+
+        template<class T> struct get_args;
+		
+		template<class R, class C, class... Args>
+		struct get_args<R(C::*)(Args...) const>
+		{
+			enum { value = sizeof...(Args) };
+		};
+
+		template<class R, class C, class... Args>
+		struct get_args<R(C::*)(Args...)>
+		{
+			enum { value = sizeof...(Args) };
+		};
+
+        #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L)
+            // #pragma message("build for c++17...")
+            #define dCPP17
+        #endif
+
+        #ifdef dCPP17
+		    template<class R, class C, class... Args>
+		    struct get_args<R(C::*)(Args...) const noexcept>
+		    {
+			    enum { value = sizeof...(Args) };
+		    };
+
+		    template<class R, class C, class... Args>
+		    struct get_args<R(C::*)(Args...) noexcept>
+		    {
+			    enum { value = sizeof...(Args) };
+		    };
+        #endif // !dCPP17
 
         template<class> struct get_lambda
         {
@@ -69,8 +103,8 @@ namespace db
 
         template<class T> struct help
         {
-            using y = std::remove_reference_t<T>;
-            using x = std::remove_cv_t<y>;
+            using y = ::std::remove_reference_t<T>;
+            using x = ::std::remove_cv_t<y>;
             enum { lambda = detail::is_lambda<x>::value  };
             enum { tuple  = detail::get_lambda<x>::value };
             enum { other  = !lambda && !tuple };
@@ -92,10 +126,13 @@ namespace db
         { 
             using y = ::std::remove_reference_t<T>;
             using x = ::std::remove_cv_t<y>;
+
+            cursor::template check(owner, 1, "single variable");
+
             const auto yes = owner.next();
             if (!yes)
-                throw std::runtime_error("[cursor::get] unexpectedly no data");
-            dst = owner.template getValue<x>(0);
+                throw ::std::runtime_error("[cursor::get] unexpectedly no data");
+            dst = owner.template get_value<x>(0);
             assert(!owner.next());
         }
 
@@ -109,11 +146,17 @@ namespace db
         template<class T>
         static dFOR_SQLITEDB(tuple) get(request& owner, T& dst)
         { 
+            static_assert(
+                ::std::tuple_size<T>::value > 0,
+                "not support: zero params of tuple"
+            );
+
             using agent = detail::get_lambda<T>;
             const auto& lambda = agent::make(dst);
-            const auto count = cursor::template loop(owner, lambda);
-            assert(count < 2);
+            const auto count 
+                = cursor::template loop(owner, lambda);
             (void) count;
+            assert(!owner.next());
         }
 
         #undef dFOR_SQLITEDB
@@ -135,10 +178,14 @@ namespace db
                 "the 'lambda' should return 'bool'"
             );
 
+            using foo = decltype(&Lambda::operator());
+			enum { args = detail::get_args<foo>::value };
+            static_assert(args > 0, "not support: zero arguments");
+            cursor::template check(owner, args, "lambda`s arguments");
             size_t count = 0;
             while(owner.next())
             {
-                const bool continue_
+                const bool continue_ 
                     = cursor::template call(owner, lambda, &Lambda::operator());
 
                 if(!continue_)
@@ -149,18 +196,39 @@ namespace db
             return count;
         }
 
+        template<class Request> 
+        static void check(Request& owner, const size_t args, const char* dsc) 
+        {
+            assert(dsc);
+            const size_t columns = owner.columns();
+            assert(args <= columns);
+            if (args <= columns)
+                return;
+
+            const str_t sc = ::std::to_string(columns);
+            const str_t sp = ::std::to_string(args);
+            const str_t msg = dsc;
+
+            const str_t reason
+                = "[cursor::check] out range: "
+                "columns = " + sc + " VS " +
+                msg + " = " + sp;
+
+            throw ::std::runtime_error(reason);
+        }
+
         template<class Request, class T> 
         static auto getArg(Request& owner, const size_t index) 
         { 
             using y = ::std::remove_reference_t<T>;
             using x = ::std::remove_cv_t<y>;
-            return owner.template getValue<x>(index);
+            return owner.template get_value<x>(index);
         }
 
         template<class R, class Obj, class ...Args, size_t ...N>
         static R callimpl(request& owner, 
             const Obj& obj, 
-            R(Obj::*method)(Args...)const, 
+            R(Obj::*method)(Args...) const, 
             const ::std::index_sequence<N...> )
         {
             using tuple_t = ::std::tuple<Args...>;
