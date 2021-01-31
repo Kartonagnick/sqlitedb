@@ -7,13 +7,23 @@ rem ============================================================================
 
 :main
     setlocal
+    @echo [RUN] QtCreator ...
 
     rem set "eDEBUG=ON"
 
     call "%eDIR_BAT_ENGINE%\run.bat" ^
         "--runIDE: QtCreator"
 
-exit /b
+    if errorlevel 1 (goto :failed)
+
+:success
+    @echo [RUN] completed successfully
+exit /b 0
+
+:failed
+    @echo [RUN] finished with erros
+exit /b 1
+
 
 rem ============================================================================
 rem ============================================================================

@@ -7,20 +7,31 @@ rem ============================================================================
 
 :main
     setlocal
+    @echo [RUN] Visual Studio...
 
     rem set "eDEBUG=ON"
-    set "order=msvc:64:debug:dynamic"
+    set "order=msvc2019:64:release:dynamic"
 
     call "%eDIR_BAT_ENGINE%\run.bat"  ^
         "--generate: cmake-makefiles" ^
         "--configurations: %order%"   ^
         "--defines: UNSTABLE_RELEASE"
+ 
+    if errorlevel 1 (goto :failed)
 
     call "%eDIR_BAT_ENGINE%\run.bat"  ^
         "--runIDE: VisualStudio"      ^
         "--configurations: %order%"
 
-exit /b
+    if errorlevel 1 (goto :failed)
+
+:success
+    @echo [RUN] completed successfully
+exit /b 0
+
+:failed
+    @echo [RUN] finished with erros
+exit /b 1
 
 rem ============================================================================
 rem ============================================================================

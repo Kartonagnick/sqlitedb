@@ -35,7 +35,7 @@ make_target(
         "SQLITE_THREADSAFE=1"
 )
 
-#--- cppsqlitedb
+#--- sqlitedb
 make_target(DEPENDENCIES "sqlite3")
 
 #--- automatically link with 'mygetst', 'gmock', or 'gtest' 
@@ -43,7 +43,7 @@ make_target(DEPENDENCIES "sqlite3")
 make_target(
     PATH_TO_SOURCES "test"
     INCLUDES "${gDIR_SOURCE}/include"
-    DEPENDENCIES "sqlite3" 
+    DEPENDENCIES "sqlitedb" # "sqlite3" 
 )
 
 ################################################################################
