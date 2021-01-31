@@ -44,17 +44,17 @@
     // #define TEST_OPERATOR_SQL                            // ready!
 //==============================================================================
 //===== sqlitedb/request ===================================||==================
-    // #define TEST_TYPE_SAFE                               // ready!
-    // #define TEST_VARIABLE                                // ready!
-    // #define TEST_TUPLE                                   // ready!
-    // #define TEST_TUPLE_TIE                               // ready!
-    // #define TEST_LAMBDA                                  // ready!
+    #define TEST_TYPE_SAFE                                  // ready!
+    #define TEST_VARIABLE                                   // ready!
+    #define TEST_TUPLE                                      // ready!
+    #define TEST_TUPLE_TIE                                  // ready!
+    #define TEST_LAMBDA                                     // ready!
 //==============================================================================
 //===== sqlitedb/serialize =================================||==================
     #define TEST_SERIALIZE                                  // ready!
 //==============================================================================
 //===== sqlitedb/container =================================||==================
-    // #define TEST_CONTAINER                               // in progress...
+    #define TEST_CONTAINER                                  // ready!
 
 //==========================================================||==================
 //==============================================================================

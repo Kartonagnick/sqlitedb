@@ -10,11 +10,11 @@ device
   - [x] Не перемещаемый.  
 
 Публичные методы класса:  
-  - [ ] [Конструктор][0]  
-  - [ ] [Деструктор][1]  
-  - [ ] [disconnect][2]  
+  - [x] [Конструктор][0]  
+  - [x] [Деструктор][1]  
+  - [x] [disconnect][2]  
 Приватные методы класса:  
-  - [ ] [begQuery][3]  
+  - [x] [prepare][3]  
 
 [0]: #Конструктор   "конструктор сразу создаёт новое соединение"  
 [1]: #Деструктор    "разрывает соединение с базой"  
@@ -60,9 +60,9 @@ device
 ```cpp
     ~device();
 ```
-- [ ] Защищён при помощи assert.  
+- [x] Защищён при помощи assert.  
 - [x] Гарантирует noexcept (no-throw guarantee).  
-- [ ] Закрывает соединение.  
+- [x] Закрывает соединение.  
 
 <br />
 <br />
@@ -92,15 +92,15 @@ disconnect
 
 
 
-begQuery
---------
+prepare
+-------
 Инициализирует объект `sqlite3_stmt`
 Которым в свою очередь инициализиуется [request](004-request.md)
 
 ```cpp
     private:
-        stmtT* begQuery(const char*  sql);
-        stmtT* begQuery(const str_t& sql);
+        stmtT* prepare(const char*  sql);
+        stmtT* prepare(const str_t& sql);
 ```
 
 - [ ] Thread-Safe.  
@@ -123,7 +123,7 @@ begQuery
     request connection::operator << (const str_t& sql) const
     {
         auto& device = *this->m_data;
-        sqlite3_stmt* cursor = device.begQuery(sql);
+        sqlite3_stmt* cursor = device.prepare(sql);
         return request(cursor);
     }
 ```

@@ -35,7 +35,7 @@ namespace db
         };
 
         static const char* code2desc(const int code) noexcept;
-        static const char* code2text(const int code) noexcept;
+        static const char* code2name(const int code) noexcept;
 
     public:
         explicit exception(const int code, str_t msg) noexcept
@@ -53,7 +53,7 @@ namespace db
         {}
 
         const char* code2desc() const noexcept;
-        const char* code2text() const noexcept;
+        const char* code2name() const noexcept;
 
         int code() const noexcept
         {

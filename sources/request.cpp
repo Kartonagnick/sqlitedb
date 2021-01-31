@@ -84,15 +84,18 @@ namespace db
 {
     request::request(request&& rhs) noexcept
         : m_cursor(rhs.m_cursor)
-        , m_index(m_index.load())
+        , m_index(rhs.m_index.load())
+        , m_start(rhs.m_start)
     {
         rhs.m_cursor = nullptr;
+        rhs.m_start  = 0;
         rhs.m_index  = 0;
     }
 
     request::request(stmtT* cursor) noexcept
         : m_cursor(cursor)
         , m_index(1)
+        , m_start()
     {}
 
     request::~request() noexcept(false)

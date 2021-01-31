@@ -1,9 +1,9 @@
-Архитектура  
+РђСЂС…РёС‚РµРєС‚СѓСЂР°  
 -----------
-- [x] Описание версии биллиотеки [confbuild.hpp][0]
-- [x] Весь код библиотеки расположен в пространстве имен `db`  
-- [x] Вся библиотека состоит:  
-  - [x] Нескольких функций управления (management.hpp):  
+- [x] РћРїРёСЃР°РЅРёРµ РІРµСЂСЃРёРё Р±РёР»Р»РёРѕС‚РµРєРё [confbuild.hpp][0]
+- [x] Р’РµСЃСЊ РєРѕРґ Р±РёР±Р»РёРѕС‚РµРєРё СЂР°СЃРїРѕР»РѕР¶РµРЅ РІ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРµ РёРјРµРЅ `db`  
+- [x] Р’СЃСЏ Р±РёР±Р»РёРѕС‚РµРєР° СЃРѕСЃС‚РѕРёС‚:  
+  - [x] РќРµСЃРєРѕР»СЊРєРёС… С„СѓРЅРєС†РёР№ СѓРїСЂР°РІР»РµРЅРёСЏ (management.hpp):  
     - [x] [db::availableDatabase(filename)][1]  
     - [x] [db::existDatabase(filename)][2]  
     - [x] [db::existTable(filename, table)][3]  
@@ -11,29 +11,33 @@
     - [x] [db::dropDatabase(filename)][5]  
     - [x] [db::dropTable(filename, table)][6]  
     - [ ] [db::dropColumn(filename, table, column)][7]  
-  - [x] Функция создания соединения:  
+  - [x] Р¤СѓРЅРєС†РёСЏ СЃРѕР·РґР°РЅРёСЏ СЃРѕРµРґРёРЅРµРЅРёСЏ:  
     - [x] [db::connect(filename, params...)][8]  
-  - [x] публичные классы:  
+  - [x] РїСѓР±Р»РёС‡РЅС‹Рµ РєР»Р°СЃСЃС‹:  
     - [x] [db::connection][9]  
-  - [x] служебно-публичные классы:  
-    - [ ] [db::request][10]  
-    - [ ] [db::cursor][11]  
-  - [x] приватные классы:  
-    - [ ] [db::device][12]  
+  - [x] СЃР»СѓР¶РµР±РЅРѕ-РїСѓР±Р»РёС‡РЅС‹Рµ РєР»Р°СЃСЃС‹:  
+    - [x] [db::request][10]  
+    - [x] [db::cursor][11]  
+    - [x] [db::iterator][12]  
+  - [x] РїСЂРёРІР°С‚РЅС‹Рµ РєР»Р°СЃСЃС‹:  
+    - [x] [db::device][13]  
+    - [x] [db::exception][14]  
 
 
-[0]:  arch/000-confbuild.md "версия библиотеки"  
+[0]:  arch/000-confbuild.md "РІРµСЂСЃРёСЏ Р±РёР±Р»РёРѕС‚РµРєРё"  
 
-[1]:  arch/001-management.md/#availableDatabase "true, если база существует, и доступна"  
-[2]:  arch/001-management.md/#existDatabase     "true, если база существует"  
-[3]:  arch/001-management.md/#existTable        "true, если таблица существует"  
-[4]:  arch/001-management.md/#existColumn       "true, если столбец существует"  
-[5]:  arch/001-management.md/#dropDatabase      "удаляет базу данных"  
-[6]:  arch/001-management.md/#dropTable         "удаляет таблицу"  
-[7]:  arch/001-management.md/#dropColumn        "удаляет столбец"  
+[1]:  arch/001-management.md/#availableDatabase "true, РµСЃР»Рё Р±Р°Р·Р° СЃСѓС‰РµСЃС‚РІСѓРµС‚, Рё РґРѕСЃС‚СѓРїРЅР°"  
+[2]:  arch/001-management.md/#existDatabase     "true, РµСЃР»Рё Р±Р°Р·Р° СЃСѓС‰РµСЃС‚РІСѓРµС‚"  
+[3]:  arch/001-management.md/#existTable        "true, РµСЃР»Рё С‚Р°Р±Р»РёС†Р° СЃСѓС‰РµСЃС‚РІСѓРµС‚"  
+[4]:  arch/001-management.md/#existColumn       "true, РµСЃР»Рё СЃС‚РѕР»Р±РµС† СЃСѓС‰РµСЃС‚РІСѓРµС‚"  
+[5]:  arch/001-management.md/#dropDatabase      "СѓРґР°Р»СЏРµС‚ Р±Р°Р·Сѓ РґР°РЅРЅС‹С…"  
+[6]:  arch/001-management.md/#dropTable         "СѓРґР°Р»СЏРµС‚ С‚Р°Р±Р»РёС†Сѓ"  
+[7]:  arch/001-management.md/#dropColumn        "СѓРґР°Р»СЏРµС‚ СЃС‚РѕР»Р±РµС†"  
 
-[8]:  arch/002-connect.md/#connect    "функция создания нового соединения"  
-[9]:  arch/003-connection.md/#connect    "объект соединения"  
-[10]: arch/004-request.md/#request   "объект запроса"  
-[11]: arch/005-cursor.md/#cursor    "объект, определяющий текущую позицию в таблице результата"  
-[12]: arch/006-device.md/#device    "низко-уровневый служебный класс для работы с sqlite3"  
+[8]:  arch/002-connect.md/#connect    "С„СѓРЅРєС†РёСЏ СЃРѕР·РґР°РЅРёСЏ РЅРѕРІРѕРіРѕ СЃРѕРµРґРёРЅРµРЅРёСЏ"  
+[9]:  arch/003-connection.md/#connect    "РѕР±СЉРµРєС‚ СЃРѕРµРґРёРЅРµРЅРёСЏ"  
+[10]: arch/004-request.md/#request   "РѕР±СЉРµРєС‚ Р·Р°РїСЂРѕСЃР°"  
+[11]: arch/005-cursor.md/#cursor    "РѕС‚РІРµС‡Р°РµС‚ Р·Р° РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С…"  
+[12]: arch/006-iterator.md/#iterator  "РѕС‚РІРµС‡Р°РµС‚ Р·Р° РїРѕР»СѓС‡РµРЅРёРµ РєРѕРЅС‚РµР№РЅРµСЂРѕРІ РґР°РЅРЅС‹С…"  
+[13]: arch/007-device.md/#device    "РЅРёР·РєРѕ-СѓСЂРѕРІРЅРµРІС‹Р№ СЃР»СѓР¶РµР±РЅС‹Р№ РєР»Р°СЃСЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ sqlite3"  
+[14]: arch/008-exception.md/#exception  "РєР»Р°СЃСЃ РёСЃРєР»СЋС‡РµРЅРёР№"  

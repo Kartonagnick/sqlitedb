@@ -37,8 +37,8 @@ namespace db
 
         void disconnect();
     private:
-        stmtT* begQuery(const char*  sql);
-        stmtT* begQuery(const str_t& sql);
+        stmtT* prepare(const char*  sql);
+        stmtT* prepare(const str_t& sql);
     private:
         mutexT   m_mutex;
         sqlite3* m_device;

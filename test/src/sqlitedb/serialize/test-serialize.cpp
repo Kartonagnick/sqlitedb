@@ -57,12 +57,12 @@ namespace test_serialize
 
     void operator >>(db::request&& out, normal& dst)
     {
-        return std::move(out) >> std::tie(dst.login, dst.age);
+        std::move(out) >> std::tie(dst.login, dst.age);
     }
 
     void operator >>(db::request&& out, small& dst)
     {
-        return std::move(out) >> std::tie(dst.login);
+        std::move(out) >> std::tie(dst.login);
     }
 }
 namespace test = test_serialize;

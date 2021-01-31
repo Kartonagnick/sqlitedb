@@ -9,10 +9,10 @@ connection
   - [x] [Деструктор][1]  
   - [x] [Конструкторы][2]  
   - [x] [operator=(connection)][3]  
-  - [ ] [operator<<(sql)][4]  
-  - [ ] [existTable(name)][5]  
-  - [ ] [existColumn(table, column)][6]  
-  - [ ] [dropTable(name)][7]  
+  - [x] [operator<<(sql)][4]  
+  - [x] [existTable(name)][5]  
+  - [x] [existColumn(table, column)][6]  
+  - [x] [dropTable(name)][7]  
   - [ ] [dropColumn(table, column)][8]  
 
 [0]: #Требования               "требования к реализации"  

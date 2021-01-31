@@ -2,10 +2,10 @@
 Тестирование функциональности
 -----------------------------
 
-[X1]: ../images/failed.png     "2021y-01m-30d"
-[V1]: ../images/success.png    "2021y-01m-30d"
-[E1]: ../images/nodata.png     "2021y-01m-30d"
-[N1]: ../images/na.png         "2021y-01m-30d"
+[X1]: ../images/failed.png     "2021y-01m-31d"
+[V1]: ../images/success.png    "2021y-01m-31d"
+[E1]: ../images/nodata.png     "2021y-01m-31d"
+[N1]: ../images/na.png         "2021y-01m-31d"
 
 | **ID** | **Сценарии**      | **0.0.2**     |  
 |:------:|:-----------------:|:-------------:|  
@@ -19,7 +19,7 @@
 |  0006  | [tuple][7]        | [![][V1]][7]  |  
 |  0007  | [lambda][8]       | [![][V1]][8]  |  
 |  0008  | [serialize][9]    | [![][V1]][9]  |  
-|  0009  | [container][10]   | [![][E1]][10] |  
+|  0009  | [container][10]   | [![][v1]][10] |  
 
 
 [0]:  test/000-auto.md/#staff          "тестирование staff"  

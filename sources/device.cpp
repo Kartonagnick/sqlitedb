@@ -234,7 +234,7 @@ namespace db
         }
 
         template<class S>
-        stmtT* begQuery(::sqlite3* device, S&& sql)
+        stmtT* prepare(::sqlite3* device, S&& sql)
         {
             assert(device);
             stmtT* cur = nullptr;
@@ -263,14 +263,22 @@ namespace db
 
     } //namespace
 
+    enum eEXTENDED_ERROR
+    {
+        eDATABASE_NOT_AVAILABLE = 26,
+        eTABLE_DOES_NOT_EXIST  = 200,  
+    };
+
     const char* code2desc(const int code) noexcept
     {
+        if (code == eTABLE_DOES_NOT_EXIST)
+            return "table does not exist";
         const auto* msg =  ::sqlite3_errstr(code);
         assert(msg);
         return msg;
     }
 
-    const char* code2text(const int code) noexcept
+    const char* code2name(const int code) noexcept
     {
         #define dSQLITE_CODE(code) case code: return #code
         switch (code)
@@ -306,7 +314,7 @@ namespace db
             dSQLITE_CODE(SQLITE_WARNING);
             dSQLITE_CODE(SQLITE_ROW);
             dSQLITE_CODE(SQLITE_DONE);
-
+            dSQLITE_CODE(eTABLE_DOES_NOT_EXIST);
             #undef dSQLITE_CODE
         default:
             assert(false && "invalid-switch-case");
@@ -346,17 +354,17 @@ namespace db
         ::db::disconnect(this->m_device, this->m_flags);
     }
 
-    stmtT* device::begQuery(const str_t& sql)
+    stmtT* device::prepare(const str_t& sql)
     {
         ::std::lock_guard<std::mutex> 
             lock(this->m_mutex);
 
         assert(!sql.empty());
         assert(this->m_device);
-        return ::db::begQuery(this->m_device, sql);
+        return ::db::prepare(this->m_device, sql);
     }
 
-    stmtT* device::begQuery(const char* sql)  
+    stmtT* device::prepare(const char* sql)  
     {
         ::std::lock_guard<std::mutex> 
             lock(this->m_mutex);
@@ -364,7 +372,7 @@ namespace db
         assert(sql);
         assert(*sql != '\0');
         assert(this->m_device);
-        return ::db::begQuery(this->m_device, sql);
+        return ::db::prepare(this->m_device, sql);
     }
 
 } // namespace db

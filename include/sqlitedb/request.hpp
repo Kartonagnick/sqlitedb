@@ -8,6 +8,7 @@
 #include <type_traits>
 #include <exception>
 #include <cstdint>
+#include <cassert>
 #include <string>
 #include <atomic>
 
@@ -17,9 +18,15 @@ struct sqlite3_stmt;
 //==============================================================================
 namespace db
 {
+    template<class t> 
+    using degradate = ::std::remove_cv_t<
+        ::std::remove_reference_t<t> 
+    >;
+
     template<class T> class getval;
     using str_t = ::std::string;
     class connection;
+    class irerator;
     class cursor;
 
     class request
@@ -27,6 +34,7 @@ namespace db
         template<class T> 
         friend class getval;
         friend class connection;
+        friend class irerator;
         friend class cursor;
 
         using sizeT = ::std::atomic_size_t;
@@ -39,10 +47,9 @@ namespace db
        ~request() noexcept(false);
     public:
         template<class T>
-        request&& operator << (const T& value)&&;
+        request&& operator << (const T& value) &&;
 
         template<class T> void operator >> (T&& dst) &&;
-
     private:
         void check_bind_count() const;
         size_t bind_count() const noexcept;
@@ -50,6 +57,8 @@ namespace db
         size_t columns() const noexcept;
 
         template<class T> auto get_value(const size_t index);
+
+        template<class T> void get_value(const size_t index, T&& dst);
     private:
         void bind(const void* blob, const size_t size);
 
@@ -98,17 +107,28 @@ namespace db
     private:
         stmtT* m_cursor;
         sizeT  m_index;
+        int    m_start;
     };
 
 
-    #define dGETVALUE_DB(type, method)                       \
-    template<> class getval<type>                            \
-    {                                                        \
-        public:                                              \
-        static type                                          \
-            get(request& owner, const size_t index) noexcept \
-                { return owner.get_##method(index); }        \
+    #define dGETVALUE_DB(type, method)                   \
+    template<> class getval<type>                        \
+    {                                                    \
+        friend class request;                            \
+        static type                                      \
+        get(request& owner, const size_t index) noexcept \
+            { return owner.get_##method(index); }        \
     }
+
+    template<class T> class getval
+    {
+        using p = ::std::add_pointer_t<T>;
+        using c = ::std::add_const_t<p>;
+        static_assert(::std::is_same<T, c > ::value,
+            "not support: user type 'T' has no specialization"
+        );
+    };
+
 
     dGETVALUE_DB(db::str_t    , text  );
     dGETVALUE_DB(double       , double);
@@ -126,13 +146,35 @@ namespace db
 
 } // namespace db
 
-#include <sqlitedb/cursor.hpp>
-
 namespace db
 {
+    template<class T> 
+    void request::get_value(const size_t index, T&& dst)
+        { dst = this->get_value<T>(index); }
+
     template<class T>
-    request&& request::operator << (const T& value) &&  
-    { 
+    auto request::get_value(const size_t index)
+    {
+        using x = ::db::degradate<T>;
+        using from = ::db::getval<x>;
+
+        ::std::exception_ptr eptr;
+        try
+        {
+            return from::get(*this, index);
+        }
+        catch (...)
+        {
+            eptr = ::std::current_exception();
+        }
+        assert(eptr);
+        this->finalize();
+        ::std::rethrow_exception(eptr);
+    }
+
+    template<class T>
+    request&& request::operator << (const T& value) &&
+    {
         ::std::exception_ptr eptr;
         try
         {
@@ -151,32 +193,24 @@ namespace db
         return ::std::move(*this);
     }
 
+} // namespace db
+
+#include <sqlitedb/cursor.hpp>
+
+namespace db
+{
     template<class T>
     void request::operator >> (T&& dst) &&
-    { 
+    {
+        if (this->m_start != 0)
+        {
+            ::db::irerator(*this).get(dst);
+            return;
+        }
+        this->m_start = 1;
         this->check_bind_count();
-        cursor::template get(*this, dst);
-    }
-
-    template<class T> 
-    auto request::get_value(const size_t index)
-    { 
-        using y = ::std::remove_reference_t<T>;
-        using x = ::std::remove_cv_t<y>;
-        using from = db::getval<x>;
-
-        ::std::exception_ptr eptr;
-        try
-        {
-            return from::get(*this, index);
-        }
-        catch (...)
-        {
-            eptr = ::std::current_exception();
-        }
-        assert(eptr);
-        this->finalize();
-        ::std::rethrow_exception(eptr);
+        ::db::cursor(*this).get(dst);
+        this->m_start = 0;
     }
 
 } // namespace db

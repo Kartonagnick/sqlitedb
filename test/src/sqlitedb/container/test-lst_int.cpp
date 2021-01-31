@@ -7,20 +7,20 @@
 
 #define dTEST_COMPONENT db, request
 #define dTEST_METHOD container
-#define dTEST_TAG vec_int
+#define dTEST_TAG list_int
 
 #include "test-staff.hpp"
 #include <sqlitedb/sqlitedb.hpp>
-#include <vector>
+#include <list>
 
 namespace staff = staff_sqlitedb;
-using cont_t = std::vector<int>;
+using cont_t = std::list<int>;
 using str_t = ::std::string;
 
 //==============================================================================
 //==============================================================================
 
-static const char* base = "00-vec_container.db";
+static const char* base = "00-list_container.db";
 
 //==============================================================================
 //==============================================================================

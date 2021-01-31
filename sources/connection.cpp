@@ -54,14 +54,14 @@ namespace db
     request connection::operator << (const str_t& sql) const
     {
         auto& device = *this->m_data;
-        auto* cursor = device.begQuery(sql);
+        auto* cursor = device.prepare(sql);
         return request(cursor);
     }
 
     request connection::operator << (const char* sql) const
     {
         auto& device = *this->m_data;
-        auto* cursor = device.begQuery(sql);
+        auto* cursor = device.prepare(sql);
         return request(cursor);
     }
 
@@ -96,7 +96,6 @@ namespace db
         return this->dropTable(str_t(name));
     }
 
-
     bool connection::dropColumn(const str_t& table, const str_t& column) const
     {
         (void) table;
@@ -109,7 +108,6 @@ namespace db
         - rename the new one.
         #endif
     }
-
 
     bool connection::existTable(const char* name) const
     {
