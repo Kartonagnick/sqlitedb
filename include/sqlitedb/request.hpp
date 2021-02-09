@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef dSQLITEDB_REQUEST_USED_ 
-#define dSQLITEDB_REQUEST_USED_ 1
+#define dSQLITEDB_REQUEST_USED_ 100
 
 #include <type_traits>
 #include <exception>

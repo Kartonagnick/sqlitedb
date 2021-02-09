@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef dSQLITEDB_CONNECTION_USED_ 
-#define dSQLITEDB_CONNECTION_USED_ 1
+#define dSQLITEDB_CONNECTION_USED_ 100
 
 #include <sqlitedb/request.hpp>
 #include <string>

@@ -1,6 +1,6 @@
 #pragma once
 #ifndef dSQLITEDB_CONFBUILD_USED_
-#define dSQLITEDB_CONFBUILD_USED_ 1
+#define dSQLITEDB_CONFBUILD_USED_ 100
 //================================================================================
 //================================================================================
 
@@ -40,7 +40,7 @@
 
 #define dVERSION_MAJOR      0
 #define dVERSION_MINOR      0
-#define dVERSION_PATCH      2
+#define dVERSION_PATCH      3
 
 #define dSTRINGIZE(...) #__VA_ARGS__
 #define dSSTRINGIZE(x) dSTRINGIZE(x)

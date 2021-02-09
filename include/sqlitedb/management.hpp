@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef dSQLITEDB_MANAGMENT_USED_ 
-#define dSQLITEDB_MANAGMENT_USED_ 1
+#define dSQLITEDB_MANAGMENT_USED_ 100
 
 #include <cassert>
 #include <string>
@@ -20,10 +20,12 @@ namespace db
 
     bool existDatabase(const char* name);
 
+
     bool existTable(
         const char* base,
         const char* table
     );
+
 
     bool existColumn(
         const char* base,
@@ -31,16 +33,20 @@ namespace db
         const char* column
     );
 
+
     bool dropDatabase(const str_t& name);
     bool dropDatabase(const char* name);
 
+
     bool dropTable(const char* base, const char* table);
 
+    #if 0
     bool dropColumn(
         const char* base,
         const char* table,
         const char* column
     );
+    #endif
 
 } // namespace db
 
@@ -57,6 +63,7 @@ namespace db
         return db::availableDatabase(n);
     }
 
+
     template<class s> bool existDatabase(const s& name)
     {
         const auto* n = &name[0];
@@ -64,6 +71,7 @@ namespace db
         assert(*n != 0);
         return db::existDatabase(n);
     }
+
 
     template <class s1, class s2> 
     bool existTable(const s1& base, const s2& table)
@@ -76,6 +84,7 @@ namespace db
         assert(*t != 0);
         return db::existTable(b, t);
     }
+
 
     template <class s1, class s2, class s3> 
     bool existColumn(const s1& base, const s2& table, const s3& column)
@@ -92,16 +101,6 @@ namespace db
         return db::existColumn(b, t, c);
     }
 
-#if 0
-    template<class s> bool dropDatabase(const s& name)
-    {
-        const auto* n = &name[0];
-        assert(n);
-        assert(*n != 0);
-        const str_t file = n;
-        return db::dropDatabase(file);
-    }
-#endif
 
     template <class s1, class s2> 
     bool dropTable(const s1& base, const s2& table)
@@ -114,6 +113,7 @@ namespace db
         assert(*t != 0);
         return db::dropTable(b, t);
     }
+
 
     template <class s1, class s2, class s3> 
     bool dropColumn(

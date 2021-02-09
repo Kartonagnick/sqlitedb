@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef dSQLITEDB_DEVICE_USED_ 
-#define dSQLITEDB_DEVICE_USED_ 1
+#define dSQLITEDB_DEVICE_USED_ 100
 
 #include <sqlitedb/connection.hpp>
 #include <mutex>
