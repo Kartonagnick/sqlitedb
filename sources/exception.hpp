@@ -3,7 +3,7 @@
 
 #pragma once
 #ifndef dSQLITEDB_EXCEPTION_USED_ 
-#define dSQLITEDB_EXCEPTION_USED_ 1
+#define dSQLITEDB_EXCEPTION_USED_ 100
 
 #include <string>
 #include <cassert>

@@ -1,7 +1,7 @@
 // [2020y-11m-30d] Idrisov Denis R.
 #pragma once
 #ifndef dTOOLS_NUMERIC_CAST_USED_ 
-#define dTOOLS_NUMERIC_CAST_USED_ 1
+#define dTOOLS_NUMERIC_CAST_USED_ 100
 
 #include <type_traits>
 #include <stdexcept>

@@ -7,25 +7,22 @@ rem =========================================================================
 :main
     setlocal
     set "eGROUP=%~1"
-    if not defined eGROUP exit /b
     @echo.
-    @echo [FINALIZE] %eGROUP% ^(%eEXPANDED_SUFFIX%)
+    @echo [FINALIZE] %eGROUP%
 
     call :normalizePath eDIR_PRODUCT ^
         "%eDIR_PRODUCT%\%eEXPANDED_SUFFIX%" 
 
-    set "dir_=%~dp0..\_artifacts"
+    set "dir_=%eDIR_WORKSPACE%\external\%eNAME_PROJECT%"
     if defined eVERSION (set "dir_=%dir_%\%eVERSION%")
     call :normalizePath eDIR_INSTALL "%dir_%"
 
-    @echo [IN DEVELOPMENT] ...
-    @echo [eDIR_PRODUCT] ... %eDIR_PRODUCT%
-    @echo [eDIR_INSTALL] ... %eDIR_INSTALL%
+    if not defined eGROUP (
+        (call :copyIncludes) && (goto :success) || (goto :failed)
+    )
 
-    rem if not defined eGROUP ((call :copyIncludes) && (goto :success) || (goto :failed))
-    rem set "eDIR_INSTALL=%eDIR_INSTALL%\%eEXPANDED_SUFFIX%"
-    rem (call :copyLibraries) || (goto :failed)
-    rem (call :copyModules)   || (goto :failed)
+    set "eDIR_INSTALL=%eDIR_INSTALL%\%eEXPANDED_SUFFIX%"
+    (call :copyLibraries) || (goto :failed)
 :success
     @echo [FINALIZE] completed successfully
     if not defined eGROUP (@echo.)
@@ -57,11 +54,6 @@ exit /b
     )    
 exit /b
 
-:copyModules
-    @echo [INSTALL] %eGROUP% modules...
-    call :copyFiles *.dll *.exe
-exit /b
-
 :copyLibraries
     @echo [INSTALL] %eGROUP% libraries...
     call :copyFiles *.a *.lib *.pdb
@@ -77,7 +69,6 @@ exit /b
     robocopy "%src%" "%dst%" %* /xf "test.*" /s >nul 2>nul
     if %errorlevel% LSS 8 exit /b 0
     @echo [ERROR] can`t copy files    
-    @echo [ERROR] code: %errorlevel%
 exit /b 1
 
 rem =========================================================================
