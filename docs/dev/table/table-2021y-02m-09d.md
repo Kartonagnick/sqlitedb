@@ -1,10 +1,10 @@
 
-[![logo](../SQLiteDB25.png)](../home.md "for developers") 
+[![logo](../../SQLiteDB25.png)](../home.md "for developers") 
 
-[X1]: ../images/failed.png    "2021y-02m-09d"
-[V1]: ../images/success.png   "2021y-02m-09d"
-[E1]: ../images/nodata.png    "2021y-02m-09d"
-[N1]: ../images/na.png        "2021y-02m-09d"
+[X1]: ../../images/failed.png    "2021y-02m-09d"
+[V1]: ../../images/success.png   "2021y-02m-09d"
+[E1]: ../../images/nodata.png    "2021y-02m-09d"
+[N1]: ../../images/na.png        "2021y-02m-09d"
 
 | **ID** | **функциональность** | **mingw810**  | **mingw730**  | **msvc720**   |  
 |:------:|:--------------------:|:-------------:|:-------------:|:-------------:|  
@@ -57,17 +57,17 @@
 <br />
 <br />
 
-[0]:  test/000-auto.md/#staff          "staff"  
-[1]:  test/000-auto.md/#management     "глобальные функции управления базой данных"  
-[2]:  test/000-auto.md/#connect        "db::connect, и конструкторо db::connection"  
-[3]:  test/000-auto.md/#tablecolumn    "db::connection - управление таблицами/столбцами"  
-[4]:  test/000-auto.md/#connection     "db::connection - методы класса"  
-[5]:  test/000-auto.md/#type_safe      "db::request - безопасность типов"  
-[6]:  test/000-auto.md/#variable       "db::request - работа с одиночной переменной"  
-[7]:  test/000-auto.md/#tuple          "db::request - работа с std::tuple"  
-[8]:  test/000-auto.md/#lambda         "db::request - работа с лябдами"  
-[9]:  test/000-auto.md/#serialize      "db::request - работа с пользовательскими типами"  
-[10]: test/000-auto.md/#container      "db::request - работа с контейнерами"  
+[0]:  ../test/000-auto.md/#staff          "staff"  
+[1]:  ../test/000-auto.md/#management     "глобальные функции управления базой данных"  
+[2]:  ../test/000-auto.md/#connect        "db::connect, и конструкторо db::connection"  
+[3]:  ../test/000-auto.md/#tablecolumn    "db::connection - управление таблицами/столбцами"  
+[4]:  ../test/000-auto.md/#connection     "db::connection - методы класса"  
+[5]:  ../test/000-auto.md/#type_safe      "db::request - безопасность типов"  
+[6]:  ../test/000-auto.md/#variable       "db::request - работа с одиночной переменной"  
+[7]:  ../test/000-auto.md/#tuple          "db::request - работа с std::tuple"  
+[8]:  ../test/000-auto.md/#lambda         "db::request - работа с лябдами"  
+[9]:  ../test/000-auto.md/#serialize      "db::request - работа с пользовательскими типами"  
+[10]: ../test/000-auto.md/#container      "db::request - работа с контейнерами"  
 
 
 
