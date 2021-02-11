@@ -360,6 +360,7 @@ namespace db
 
         if (!this->m_device)
             return;
+
         ::db::disconnect(this->m_device, this->m_flags);
     }
 

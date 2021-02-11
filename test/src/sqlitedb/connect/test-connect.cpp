@@ -220,6 +220,51 @@ TEST_COMPONENT(013)
     ASSERT_TRUE(staff::dbaseDelete(base));
 }
 
+TEST_COMPONENT(014)
+{
+    const char* base = "014-sample.db";
+
+    staff::dbaseDelete(base);
+    ASSERT_TRUE(!staff::fileExists(base));
+    {
+        db::connection con1 = db::connect(base, db::eCREATE | db::eREADWRITE);
+        staff::makeTable(con1, "users");
+        ASSERT_TRUE(con1.existTable("users"));
+        staff::addToTable(con1, 12, 12);
+        staff::addToTable(con1, 22, 22);
+        staff::addToTable(con1, 32, 32);
+
+        {
+            db::connection con2 = db::connect(base, db::eCREATE | db::eREADWRITE);
+            staff::makeTable(con2, "cats");
+            ASSERT_TRUE(con2.existTable("cats"));
+        }
+    }
+    ASSERT_TRUE(staff::fileExists(base));
+    ASSERT_TRUE(staff::dbaseDelete(base));
+}
+
+TEST_COMPONENT(015)
+{
+    const char* base = "015-saturn.db";
+
+    staff::dbaseDelete(base);
+    ASSERT_TRUE(!staff::fileExists(base));
+    {
+        db::connect(base, db::eCREATE);
+
+        db::connection con2 = db::connect(base, db::eREADWRITE);        
+        staff::makeTable(con2, "users");
+        staff::addToTable(con2, 42, 32);
+        {
+            db::connection con1 = db::connect(base);
+        }
+        staff::addToTable(con2, 32, 32);
+    }
+    ASSERT_TRUE(staff::fileExists(base));
+    ASSERT_TRUE(staff::dbaseDelete(base));
+}
+
 //==============================================================================
 //==============================================================================
 #endif // ! TEST_CONNECT

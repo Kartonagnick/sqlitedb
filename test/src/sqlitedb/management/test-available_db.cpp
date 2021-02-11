@@ -81,6 +81,26 @@ TEST_COMPONENT(006)
 }
 #endif // !!NDEBUG
 
+
+TEST_COMPONENT(007)
+{
+    const str_t base = "006-venera.db";
+    staff::dbaseDelete(base);
+    db::connect(base, db::eCREATE);
+    ASSERT_TRUE(db::existDatabase(base));
+
+    //--- открывает базу в режиме readonly.
+    db::availableDatabase(base);
+
+    //--- по этой причине журнал не будет удален.
+    ASSERT_TRUE(staff::fileExists("006-venera.db-shm"));
+    ASSERT_TRUE(staff::fileExists("006-venera.db-wal"));
+    staff::dbaseDelete(base);
+    ASSERT_TRUE(!staff::fileExists("006-venera.db-shm"));
+    ASSERT_TRUE(!staff::fileExists("006-venera.db-wal"));
+    ASSERT_TRUE(!db::existDatabase(base));
+}
+
 //==============================================================================
 //==============================================================================
 #endif // ! TEST_AVAILABLE_DATABASE

@@ -40,7 +40,7 @@
 
 #define dVERSION_MAJOR      0
 #define dVERSION_MINOR      0
-#define dVERSION_PATCH      4
+#define dVERSION_PATCH      5
 
 #define dSTRINGIZE(...) #__VA_ARGS__
 #define dSSTRINGIZE(x) dSTRINGIZE(x)
