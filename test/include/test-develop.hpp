@@ -30,6 +30,7 @@
     // #define TEST_REMOVE                                  // ready!
     // #define TEST_EXISTS_DATABASE                         // ready!
     #define TEST_AVAILABLE_DATABASE                         // ready!
+    #define TEST_CLEAN_DATABASE                             // in progress...
     // #define TEST_EXISTS_TABLE                            // ready!
     // #define TEST_EXISTS_COLUMN                           // ready!
     // #define TEST_DROP_DATABASE                           // ready!

@@ -85,15 +85,18 @@ namespace db
             int flags = 0;
 
             if (hasFlags(eCREATE, mode))
+            {
                 ::db::addFlags(SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, flags);
+                assert(!hasFlags(eREADONLY, mode));
+            }
 
-            else if (hasFlags(eREADONLY, mode))
+            if (hasFlags(eREADONLY, mode))
                 ::db::addFlags(SQLITE_OPEN_READONLY, flags);
 
-            else if (hasFlags(eREADWRITE, mode))
+            if (hasFlags(eREADWRITE, mode))
                 ::db::addFlags(SQLITE_OPEN_READWRITE, flags);
 
-            else if (hasFlags(eOPEN_URI, mode))
+            if (hasFlags(eOPEN_URI, mode))
                 ::db::addFlags(SQLITE_OPEN_URI, flags);
 
             return flags;
