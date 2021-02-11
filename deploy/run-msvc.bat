@@ -10,12 +10,12 @@ rem ============================================================================
     @echo [RUN] Visual Studio...
 
     rem set "eDEBUG=ON"
-    set "order=msvc2019:64:release:dynamic"
+    set "order=msvc2019:64:debug:static"
 
     call "%eDIR_BAT_ENGINE%\run.bat"  ^
         "--generate: cmake-makefiles" ^
         "--configurations: %order%"   ^
-        "--defines: UNSTABLE_RELEASE"
+        "--defines: STABLE_RELEASE"
  
     if errorlevel 1 (goto :failed)
 

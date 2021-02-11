@@ -201,7 +201,7 @@ namespace db
 //==============================================================================
 namespace db
 {
-    connection connect(const str_t& path, const eOPENMODE mode, const size_t timeout)
+    connection connect(const str_t& path, const int mode, const size_t timeout)
     {
         assert(!path.empty());
         auto shared = ::std::make_shared<db::device>(path, mode, timeout);
@@ -211,7 +211,7 @@ namespace db
         return result;
     }
 
-    connection connect(const char* path, const eOPENMODE mode, const size_t timeout)
+    connection connect(const char* path, const int mode, const size_t timeout)
     {
         assert(path);
         assert(*path != 0);

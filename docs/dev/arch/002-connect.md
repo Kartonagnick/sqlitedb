@@ -42,13 +42,13 @@ connect
 
     connection connect(
         const str_t& path, 
-        const eOPENMODE mode = eREADONLY,
+        const int mode = eREADONLY,
         const size_t timeout = 150 // milliseconds
     );
 
     connection connect(
         const char* path, 
-        const eOPENMODE mode = eREADONLY,
+        const int mode = eREADONLY,
         const size_t timeout = 150 // milliseconds
     );
 

@@ -194,7 +194,31 @@ TEST_COMPONENT(011)
     ASSERT_DEATH_DEBUG(db::connect(filename));
 }
 
+TEST_COMPONENT(012)
+{
+    const char* base = "012-sample.db";
+    ASSERT_DEATH_DEBUG(db::connect(base, 1000500));
+}
+
 #endif // !!NDEBUG
+
+//==============================================================================
+//==============================================================================
+
+TEST_COMPONENT(013)
+{
+    const char* base = "002-sample.db";
+
+    staff::dbaseDelete(base);
+    ASSERT_TRUE(!staff::fileExists(base));
+    {
+        db::connection con = db::connect(base, db::eCREATE | db::eREADWRITE);
+        staff::makeTable(con, "users");
+        ASSERT_TRUE(con.existTable("users"));
+    }
+    ASSERT_TRUE(staff::fileExists(base));
+    ASSERT_TRUE(staff::dbaseDelete(base));
+}
 
 //==============================================================================
 //==============================================================================

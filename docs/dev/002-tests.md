@@ -7,6 +7,7 @@
 [E1]: ../images/nodata.png     "2021y-01m-31d"
 [N1]: ../images/na.png         "2021y-01m-31d"
 
+[V2]: ../images/success.png    "2021y-02m-11d"
 [V2]: ../images/success.png    "2021y-02m-09d"
 
 | **ID** | **Сценарии**      | **0.0.2**     | **0.0.3**     |  
