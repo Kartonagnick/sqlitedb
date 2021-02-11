@@ -9,17 +9,17 @@ rem ============================================================================
 
     rem set "eDEBUG=ON"
 
-    rem set "VC=msvc:64:all:dynamic"
+    set "VC=msvc:64:release:static"
     rem set "MG=mingw:64:all:static"
-    rem set "order=%VC%"
+    set "order=%VC%"
     rem set "order=%MG%"
     rem set "order=%VC%; %MG%"
-    set "order=all"
+    rem set "order=all"
 
     rem for development
     rem (call :generate) && (goto :success) || (goto :failed)
 
-    (call :clean)    || (goto :failed)
+    rem (call :clean)    || (goto :failed)
     (call :build)    || (goto :failed)
     (call :runTests) || (goto :failed)
     (call :install)  || (goto :failed)

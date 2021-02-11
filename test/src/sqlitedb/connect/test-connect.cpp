@@ -198,4 +198,21 @@ TEST_COMPONENT(011)
 
 //==============================================================================
 //==============================================================================
+
+TEST_COMPONENT(008)
+{
+    const char* base = "002-sample.db";
+
+    staff::dbaseDelete(base);
+    ASSERT_TRUE(!staff::fileExists(base));
+    {
+        db::connection con = db::connect(base, db::eCREATE| db::eREADWRITE);
+        (void)con;
+    }
+    ASSERT_TRUE(staff::fileExists(base));
+    ASSERT_TRUE(staff::dbaseDelete(base));
+}
+
+//==============================================================================
+//==============================================================================
 #endif // ! TEST_CONNECT

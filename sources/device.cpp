@@ -167,7 +167,7 @@ namespace db
                 {
                     db::execSQL(device, "VACUUM;ANALYZE");
                 }
-                catch (const std::exception& e)
+                catch (const ::std::exception& e)
                 {
                     reason += e.what();
                     reason += "\n[db::disconnect] "
@@ -185,7 +185,7 @@ namespace db
             {
                 assert(reason.back() == '\n');
                 reason.pop_back();
-                throw std::runtime_error(reason);
+                throw ::std::runtime_error(reason);
             }
         }
 
