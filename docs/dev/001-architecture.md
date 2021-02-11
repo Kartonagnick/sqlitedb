@@ -4,6 +4,7 @@
 - [x] Весь код библиотеки расположен в пространстве имен `db`  
 - [x] Вся библиотека состоит:  
   - [x] Нескольких функций управления (management.hpp):  
+    - [x] [db::cleanDatabase(filename)][15]  
     - [x] [db::availableDatabase(filename)][1]  
     - [x] [db::existDatabase(filename)][2]  
     - [x] [db::existTable(filename, table)][3]  
@@ -26,6 +27,7 @@
 
 [0]:  arch/000-confbuild.md "версия библиотеки"  
 
+[15]: arch/001-management.md/#cleanDatabase     "очистка и оптимизация базы"  
 [1]:  arch/001-management.md/#availableDatabase "true, если база существует, и доступна"  
 [2]:  arch/001-management.md/#existDatabase     "true, если база существует"  
 [3]:  arch/001-management.md/#existTable        "true, если таблица существует"  

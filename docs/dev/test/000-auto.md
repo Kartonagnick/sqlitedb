@@ -30,6 +30,7 @@
     - [x] assert(!filename.empty());  
   - [x] Тесты служебной функции **db::exists**  
   - [x] Тесты служебной функции **db::remove**  
+  - [x] Тесты API функции [db::cleanDatabase][7]
   - [x] Тесты API функции [db::availableDatabase][0]
   - [x] Тесты API функции [db::existDatabase][1]
   - [x] Тесты API функции [db::existTable][2]
@@ -48,6 +49,7 @@
 [4]: ../arch/001-management.md/#dropDatabase
 [5]: ../arch/001-management.md/#dropTable
 [6]: ../arch/001-management.md/#dropColumn
+[7]: ../arch/001-management.md/#cleanDatabase
 
 
 

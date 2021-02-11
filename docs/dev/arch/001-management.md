@@ -2,6 +2,7 @@
 Список функций
 --------------
 
+- [ ] [cleanDatabase](#cleanDatabase "обслуживание базы: чек-поинты, вакуумб анализ")
 - [x] [availableDatabase](#availableDatabase "Проверяет доступность базы данных для использования")
 - [x] [existDatabase](#existDatabase "Проверяет существование базы данных")
 - [x] [existTable](#existTable "Проверяет существует ли указанная таблица")
@@ -14,6 +15,28 @@
 <br />
 
 
+
+
+
+
+## cleanDatabase
+Обслуживание базы: чек-поинты, вакуум, аналиp.  
+Эту функцию полезно вызывать перед бэкапами.  
+Она удаляет весь накопившийся временный хлам, 
+и осуществляет оптимизацию.  
+
+```c++
+template <class s> 
+void cleanDatabase(const s& filename);
+
+void cleanDatabase(const char* filename);
+```
+
+- [x] если база не доступна -> бросит исключение.  
+- [x] если соединение readonly -> бросит исключение.  
+- [x] может бросить исключение. (например: std::bad_alloc)  
+- [x] assert(!filename.empty());  
+- [x] assert(filename);  
 
 
 

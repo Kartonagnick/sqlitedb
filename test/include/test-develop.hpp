@@ -29,14 +29,15 @@
     // #define TEST_EXISTS                                  // ready!
     // #define TEST_REMOVE                                  // ready!
     // #define TEST_EXISTS_DATABASE                         // ready!
-    // #define TEST_AVAILABLE_DATABASE                      // ready!
+    #define TEST_AVAILABLE_DATABASE                         // ready!
+    #define TEST_CLEAN_DATABASE                             // in progress...
     // #define TEST_EXISTS_TABLE                            // ready!
     // #define TEST_EXISTS_COLUMN                           // ready!
     // #define TEST_DROP_DATABASE                           // ready!
     // #define TEST_DROP_TABLE                              // ready!
 //==============================================================================
 //===== sqlitedb/connect ===================================||==================
-    // #define TEST_CONNECT                                 // ready!
+    #define TEST_CONNECT                                    // ready!
 //==============================================================================
 //===== sqlitedb/connection ================================||==================
     // #define TEST_TABLE                                   // ready!
@@ -44,17 +45,17 @@
     // #define TEST_OPERATOR_SQL                            // ready!
 //==============================================================================
 //===== sqlitedb/request ===================================||==================
-    #define TEST_TYPE_SAFE                                  // ready!
-    #define TEST_VARIABLE                                   // ready!
-    #define TEST_TUPLE                                      // ready!
-    #define TEST_TUPLE_TIE                                  // ready!
-    #define TEST_LAMBDA                                     // ready!
+    // #define TEST_TYPE_SAFE                               // ready!
+    // #define TEST_VARIABLE                                // ready!
+    // #define TEST_TUPLE                                   // ready!
+    // #define TEST_TUPLE_TIE                               // ready!
+    // #define TEST_LAMBDA                                  // ready!
 //==============================================================================
 //===== sqlitedb/serialize =================================||==================
-    #define TEST_SERIALIZE                                  // ready!
+    // #define TEST_SERIALIZE                               // ready!
 //==============================================================================
 //===== sqlitedb/container =================================||==================
-    #define TEST_CONTAINER                                  // ready!
+    // #define TEST_CONTAINER                               // ready!
 
 //==========================================================||==================
 //==============================================================================

@@ -65,6 +65,8 @@ namespace db
         request operator << (const str_t& sql) const;
         request operator << (const char*  sql) const;
     public:
+        void cleanDB() const;
+
         bool existTable(const char* name) const;
 
         // table must be exist

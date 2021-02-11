@@ -21,7 +21,7 @@ namespace db
             if (this->m_data)
                 this->m_data->disconnect();
         }
-        catch (const std::exception& e)
+        catch (const ::std::exception& e)
         {
             const char* reason = e.what();
             (void) reason;
@@ -53,6 +53,7 @@ namespace db
 
     request connection::operator << (const str_t& sql) const
     {
+        assert(this->m_data);
         auto& device = *this->m_data;
         auto* cursor = device.prepare(sql);
         return request(cursor);
@@ -60,6 +61,7 @@ namespace db
 
     request connection::operator << (const char* sql) const
     {
+        assert(this->m_data);
         auto& device = *this->m_data;
         auto* cursor = device.prepare(sql);
         return request(cursor);
@@ -71,6 +73,12 @@ namespace db
 //==============================================================================
 namespace db
 {
+    void connection::cleanDB() const
+    {
+        assert(this->m_data);
+        this->m_data->cleanDB();
+    }
+
     bool connection::dropTable(const str_t& table) const
     {
         //const str_t sql = "DROP TABLE IF EXISTS " + table;

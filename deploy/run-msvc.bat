@@ -15,7 +15,7 @@ rem ============================================================================
     call "%eDIR_BAT_ENGINE%\run.bat"  ^
         "--generate: cmake-makefiles" ^
         "--configurations: %order%"   ^
-        "--defines: STABLE_RELEASE"
+        "--defines: UNSTABLE_RELEASE"
  
     if errorlevel 1 (goto :failed)
 

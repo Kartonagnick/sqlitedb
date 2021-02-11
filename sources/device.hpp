@@ -35,6 +35,7 @@ namespace db
 
         ~device();
 
+        void cleanDB() ;
         void disconnect();
     private:
         stmtT* prepare(const char*  sql);

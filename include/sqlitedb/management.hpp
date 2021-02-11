@@ -15,6 +15,8 @@ namespace db
 {
     using str_t = ::std::string;
 
+    void cleanDatabase(const char* name);
+
     bool availableDatabase(const char* name);
 
 
@@ -55,6 +57,16 @@ namespace db
 
 namespace db
 {
+    template<class s> void cleanDatabase(const s& name)
+    {
+        const auto* n = &name[0];
+        assert(n);
+        assert(*n != 0);
+        db::cleanDatabase(n);
+    }
+
+    
+
     template<class s> bool availableDatabase(const s& name)
     {
         const auto* n = &name[0];
