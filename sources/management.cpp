@@ -70,6 +70,15 @@ namespace db
 
 namespace db
 {
+    void cleanDatabase(const char* name)
+    {
+        assert(name);
+        assert(name[0] != 0);
+        const auto con = db::connect(name, eREADWRITE);
+        con.cleanDB();
+    }
+
+
     bool existDatabase(const char* filename) noexcept
     {
         assert(filename);

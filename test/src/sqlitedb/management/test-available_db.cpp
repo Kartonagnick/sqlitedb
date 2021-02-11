@@ -81,7 +81,6 @@ TEST_COMPONENT(006)
 }
 #endif // !!NDEBUG
 
-
 TEST_COMPONENT(007)
 {
     const str_t base = "006-venera.db";
@@ -95,9 +94,13 @@ TEST_COMPONENT(007)
     //--- по этой причине журнал не будет удален.
     ASSERT_TRUE(staff::fileExists("006-venera.db-shm"));
     ASSERT_TRUE(staff::fileExists("006-venera.db-wal"));
-    staff::dbaseDelete(base);
+
+
+    db::cleanDatabase(base);
     ASSERT_TRUE(!staff::fileExists("006-venera.db-shm"));
     ASSERT_TRUE(!staff::fileExists("006-venera.db-wal"));
+
+    staff::dbaseDelete(base);
     ASSERT_TRUE(!db::existDatabase(base));
 }
 

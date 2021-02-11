@@ -105,11 +105,12 @@ namespace db
     namespace
     {
         static inline 
-        void close(::sqlite3* device) noexcept
+        void close(::sqlite3*& device) noexcept
         {
             assert(device);
             const int ret = ::sqlite3_close(device);
             assert(ret == SQLITE_OK);
+            device = nullptr;
             (void) ret;
         }
 
@@ -151,9 +152,19 @@ namespace db
             throw db::exception(ret_code, reason);
         }
 
+
         static inline 
-        void disconnect(::sqlite3*& device, const int flags) 
+        void cleanDB(::sqlite3*& device, const int flags) 
         {
+            const bool readonly
+                = db::hasFlags(db::eREADONLY, flags);
+
+            assert(!readonly);
+            if (readonly)
+                throw std::runtime_error("db::cleanDB(): "
+                    "can not clean database in 'READONLY' mode"
+                );
+
             int walLog = 0;
             int walCheckpoints = 0;
             const int result = ::sqlite3_wal_checkpoint_v2(
@@ -166,30 +177,23 @@ namespace db
 
             str_t reason;
             if(result != SQLITE_OK)
-                reason += "[db::disconnect] failed to run a checkpoint operation\n";
+                reason += "[db::cleanDB] "
+                    "failed to run a checkpoint operation\n";
 
             if(::sqlite3_get_autocommit(device) == 0)
-                reason += "[db::disconnect] auto-commit mode must be enabled\n";
+                reason += "[db::cleanDB] "
+                    "auto-commit mode must be enabled\n";
 
-            if(db::hasFlags(db::eREADWRITE, flags))
+            try
             {
-                try
-                {
-                    db::execSQL(device, "VACUUM;ANALYZE");
-                }
-                catch (const ::std::exception& e)
-                {
-                    reason += e.what();
-                    reason += "\n[db::disconnect] "
-                        "operation 'defragmented' or 'analyzed' failed\n";
-                }
+                db::execSQL(device, "VACUUM;ANALYZE");
             }
-
-            const int ret = ::sqlite3_close(device);
-            device = nullptr;
-            assert(ret == SQLITE_OK);
-            if(ret != SQLITE_OK)
-                reason += "[db::disconnect] operation 'close' failed\n";
+            catch (const ::std::exception& e)
+            {
+                reason += e.what();
+                reason += "\n[db::cleanDB] "
+                    "operation 'defragmented' or 'analyzed' failed\n";
+            }
             
             if (!reason.empty())
             {
@@ -263,7 +267,7 @@ namespace db
                 "sqlite3_prepare_v2(" + db::cast(sql) + "): " + msg;
 
             const int result 
-                = std::strncmp(msg.c_str(), "no such table: ", 15);
+                = ::std::strncmp(msg.c_str(), "no such table: ", 15);
 
             if(result == 0)
                 throw db::exception(db::exception::eTABLE_DOES_NOT_EXIST, reason);
@@ -360,8 +364,7 @@ namespace db
 
         if (!this->m_device)
             return;
-
-        ::db::disconnect(this->m_device, this->m_flags);
+        ::db::close(this->m_device);
     }
 
     stmtT* device::prepare(const str_t& sql)
@@ -383,6 +386,13 @@ namespace db
         assert(*sql != '\0');
         assert(this->m_device);
         return ::db::prepare(this->m_device, sql);
+    }
+
+    void device::cleanDB() 
+    {
+        ::std::lock_guard<std::mutex> 
+            lock(this->m_mutex);
+        db::cleanDB(this->m_device, this->m_flags);
     }
 
 } // namespace db
