@@ -51,29 +51,35 @@ namespace db
     namespace
     {
         // true, если все указанные в my включены в flags
-        inline bool hasFlags(const int my, const int flags) noexcept
+        static inline 
+        bool hasFlags(const int my, const int flags) noexcept
             { return (my & flags) == my; }
 
         #if 0
         // true, если любой, из указаннных в my, включен в flags
-        inline bool hasAnyFlags(const int my, const int flags) noexcept
+        static inline 
+        bool hasAnyFlags(const int my, const int flags) noexcept
             { return (my & flags) != 0; }
         #endif
 
-        inline void addFlags(const int my, int& flags) noexcept
+        static inline 
+        void addFlags(const int my, int& flags) noexcept
             { flags |= my; }
 
-        inline void delFlags(const int my, int& flags) noexcept
+        static inline 
+        void delFlags(const int my, int& flags) noexcept
             { flags &= (~my); }
 
-        inline bool checkFlags(int flags) noexcept
+        static inline 
+        bool checkFlags(int flags) noexcept
         {
             const int my = eREADONLY | eREADWRITE | eCREATE | eOPEN_URI;
             ::db::delFlags(my, flags);
             return flags == 0;
         }
 
-        inline int adaptive(const int mode) noexcept
+        static inline 
+        int adaptive(const int mode) noexcept
         {
             assert(db::checkFlags(mode));
             int flags = 0;
@@ -98,7 +104,8 @@ namespace db
     // sqlite3
     namespace
     {
-        inline void close(::sqlite3* device) noexcept
+        static inline 
+        void close(::sqlite3* device) noexcept
         {
             assert(device);
             const int ret = ::sqlite3_close(device);
@@ -106,7 +113,8 @@ namespace db
             (void) ret;
         }
 
-        inline void setTimeout(::sqlite3* device, const size_t milliseconds)
+        static inline 
+        void setTimeout(::sqlite3* device, const size_t milliseconds)
         {
             assert(device);
             const int timeout = ::db::cast(milliseconds);
@@ -118,7 +126,8 @@ namespace db
             throw std::runtime_error("[db::setTimeout] sqlite3_busy_timeout: " + msg);
         }
 
-        inline void execSQL(::sqlite3* device, const char* sql) 
+        static inline 
+        void execSQL(::sqlite3* device, const char* sql) 
         {
             assert(sql);
             assert(device);
@@ -142,6 +151,7 @@ namespace db
             throw db::exception(ret_code, reason);
         }
 
+        static inline 
         void disconnect(::sqlite3*& device, const int flags) 
         {
             int walLog = 0;
@@ -189,10 +199,8 @@ namespace db
             }
         }
 
-        inline ::sqlite3* getDevice(
-            const str_t& filename,
-            const eOPENMODE flags,
-            const size_t timeout)
+        static inline 
+        ::sqlite3* getDevice(const str_t& filename, const int flags, const size_t timeout)
         {
             assert(!filename.empty());
 
@@ -234,6 +242,7 @@ namespace db
         }
 
         template<class S>
+        static inline
         stmtT* prepare(::sqlite3* device, S&& sql)
         {
             assert(device);
@@ -329,7 +338,7 @@ namespace db
 //===[connection::data] ========================================================
 namespace db
 {
-    device::device(const str_t& filename, const eOPENMODE mode, const size_t timeout)
+    device::device(const str_t& filename, const int mode, const size_t timeout)
         : m_mutex()
         , m_device()
         , m_flags()

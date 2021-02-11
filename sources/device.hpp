@@ -29,7 +29,7 @@ namespace db
 
         device(
             const str_t& filename,
-            const eOPENMODE mode,
+            const int mode,
             const size_t timeout
         );
 

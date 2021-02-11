@@ -49,7 +49,7 @@ namespace db
     {
         friend connection connect(
             const str_t&, 
-            const eOPENMODE, 
+            const int, 
             const size_t
         );
 
@@ -101,7 +101,7 @@ namespace db
         const str_t& path, 
 
         // open mode
-        const eOPENMODE mode = eREADONLY,
+        const int mode = eREADONLY,
 
         // This routine sets a busy handler that sleeps 
         //   for a specified amount of time when a table is locked. 
@@ -116,7 +116,7 @@ namespace db
 
     connection connect(
         const char* path, 
-        const eOPENMODE mode = eREADONLY,
+        const int mode = eREADONLY,
         const size_t timeout = 150 // milliseconds
     );
 
