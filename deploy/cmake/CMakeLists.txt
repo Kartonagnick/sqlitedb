@@ -43,7 +43,7 @@ make_target(DEPENDENCIES "sqlite3")
 make_target(
     PATH_TO_SOURCES "test"
     INCLUDES "${gDIR_SOURCE}/include"
-    DEPENDENCIES "sqlitedb" # "sqlite3" 
+    DEPENDENCIES "sqlitedb" 
 )
 
 ################################################################################
