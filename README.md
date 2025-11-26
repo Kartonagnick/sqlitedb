@@ -84,6 +84,6 @@ Keywords: sqlite, sqlite3, C, library, wrapper C++
         >> std::tie(login, dsc);
 ```
 
-1) [История](docs/history.md)  
+[Документация](docs/home.md)  
 
 
